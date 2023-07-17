@@ -20,16 +20,12 @@
     "@dataverse/tableland-client-toolkit": "latest",
     "@dataverse/xmtp-client-toolkit": "latest",
     "@livepeer/react": "^2.5.5",
-    "buffer": "^6.0.3",
-    "chalk": "^4.1.2",
-    "crlf": "^1.1.1",
     "ethers": "5.6.9",
     "path": "^0.12.7",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-json-view": "^1.21.3",
-    "react-router-dom": "^6.13.0",
-    "typescript": "^5.0.3"
+    "react-router-dom": "^6.13.0"
   },
   "devDependencies": {
     "@types/node": "^18.15.11",
