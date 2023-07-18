@@ -1,9 +1,9 @@
 export const config = {
-  name: "dapp_table_client_test_updated", // app name should NOT contain "-"
-  logo: "http://no-logo.com",
-  website: [], // you can use localhost:(port) for testing
-  defaultFolderName: "Untitled",
-  description: "",
+  name: "dataverse_app_example", // app name should NOT contain "-"
+  logo: "https://github.com/dataverse-os/core-connector/raw/main/logo.svg",
+  website: ["https://dataverse-os.com"], // you can use localhost:(port) for testing
+  defaultFolderName: "Main",
+  description: "This is dataverse app example.",
   models: [
     {
       isPublicDomain: false, // default
@@ -13,6 +13,56 @@ export const config = {
     {
       isPublicDomain: true,
       schemaName: "profile.graphql",
+      encryptable: [],
+    },
+    {
+      isPublicDomain: false,
+      schemaName: "channel.graphql",
+      encryptable: [],
+    },
+    {
+      isPublicDomain: false,
+      schemaName: "chatmessage.graphql",
+      encryptable: ["link", "cid"],
+    },
+    {
+      isPublicDomain: false,
+      schemaName: "notification.graphql",
+      encryptable: [],
+    },
+    {
+      isPublicDomain: false,
+      schemaName: "chatgpgkey.graphql",
+      encryptable: ["pgp_key"],
+    },
+    {
+      isPublicDomain: false,
+      schemaName: "livepeerasset.graphql",
+      encryptable: ["storage", "playback_id"],
+    },
+    {
+      isPublicDomain: false,
+      schemaName: "table.graphql",
+      encryptable: [],
+    },
+    {
+      isPublicDomain: false, 
+      schemaName: "xmtpmessage.graphql",
+      encryptable: ["content"],
+    },
+    {
+      isPublicDomain: false, 
+      schemaName: "xmtpkeycache.graphql",
+      encryptable: ["keys"],
+    },
+    {
+      isPublicDomain: false, 
+      schemaName: "lenspublication.graphql",
+      encryptable: [],
+    },
+    {
+      isPublicDomain: false, 
+      schemaName: "lenscollection.graphql",
       encryptable: [],
     },
   ],

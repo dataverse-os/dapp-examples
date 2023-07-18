@@ -1,9 +1,9 @@
 export const config = {
-  name: "dapp_table_client_test_updated", // app name should NOT contain "-"
-  logo: "http://no-logo.com",
-  website: [], // you can use localhost:(port) for testing
-  defaultFolderName: "Untitled",
-  description: "",
+  name: "dataverse_app_example", // app name should NOT contain "-"
+  logo: "https://github.com/dataverse-os/core-connector/raw/main/logo.svg",
+  website: ["https://dataverse-os.com"], // you can use localhost:(port) for testing
+  defaultFolderName: "Main",
+  description: "This is dataverse app example.",
   models: [
     {
       isPublicDomain: false, // default
