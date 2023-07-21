@@ -1,20 +1,14 @@
 <br/>
 <p align="center">
 <a href=" " target="_blank">
-<img src="./logo.svg" width="180" alt="Dataverse logo">
+<img src="./vite.svg" width="180" alt="Dataverse logo">
 </a >
 </p >
 <br/>
 
-# dapp-examples
+# dapp-base-example
 
 ## Overview
-
-### 1.base
-
-This is a basic example of a Dataverse dapp, which includes two models: `post` and `profile` with locate in `./base/models`. It demonstrates the process of creating, loading, monetizing, and unlocking a post by using Dataverse hooks.
-
-### 2.with-toolkits
 
 This example adds some commonly used [dweb-toolkit](https://github.com/dataverse-os/dweb-toolkits) on top of the base. In this example, the models will be diverse and varied.
 
@@ -28,12 +22,6 @@ Before running example, you need to install `dataverseos-cmd`.
 
 ```
 pnpm install -g dataverseos-cmd
-```
-
-Here we use `base` as an example.
-
-```
-cd base
 ```
 
 ### 2.Install
