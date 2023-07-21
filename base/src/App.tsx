@@ -2,18 +2,16 @@ import "./App.css";
 import React, { useState, useEffect } from "react";
 import ReactJson from "react-json-view";
 import {
-  ReturnType,
   Currency,
-  SYSTEM_CALL,
   DataverseConnector,
   Extension,
+  StreamRecord
 } from "@dataverse/dataverse-connector";
 import { useWallet, useStream } from "@dataverse/hooks";
 import { Model, ModelParser, Output } from "@dataverse/model-parser";
 import app from "../output/app.json";
 import pacakage from "../package.json";
 
-type StreamRecord = Awaited<ReturnType[SYSTEM_CALL.loadStream]>;
 const dataverseConnector = new DataverseConnector(Extension);
 const appVersion = pacakage.version;
 const modelParser = new ModelParser(app as Output);
