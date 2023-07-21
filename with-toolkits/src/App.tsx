@@ -1,16 +1,18 @@
 import "./App.css";
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Currency } from "@dataverse/core-connector";
-import { useWallet, useStream } from "./hooks";
+import {
+  Currency,
+  StreamRecord
+} from "@dataverse/dataverse-connector";
+import { useWallet, useStream } from "@dataverse/hooks";
 import ReactJson from "react-json-view";
-import { StreamRecord } from "./types";
 import { useConfig } from "./context/configContext";
 import { Model } from "@dataverse/model-parser";
 
 function App() {
   const navigate = useNavigate();
-  const { modelParser, appVersion } = useConfig();
+  const { dataverseConnector, modelParser, appVersion } = useConfig();
   const [postModel, setPostModel] = useState<Model>();
   const [currentStreamId, setCurrentStreamId] = useState<string>();
   const [publicPost, setPublicPost] = useState<StreamRecord>();
@@ -21,7 +23,7 @@ function App() {
   const [monetizedPost, setMonetizedPost] = useState<StreamRecord>();
   const [unlockedPost, setUnlockedPost] = useState<StreamRecord>();
 
-  const { connectWallet } = useWallet();
+  const { connectWallet } = useWallet(dataverseConnector);
 
   const {
     pkh,
@@ -33,7 +35,10 @@ function App() {
     monetizeStream,
     unlockStream,
     updateStream,
-  } = useStream();
+  } = useStream({
+    dataverseConnector,
+    appId: modelParser.appId,
+  });
 
   useEffect(() => {
     const postModel = modelParser.getModelByName("post");
@@ -54,7 +59,6 @@ function App() {
     }
     const date = new Date().toISOString();
     const { streamId, ...streamRecord } = await createPublicStream({
-      pkh,
       model: postModel,
       stream: {
         appVersion,
@@ -105,6 +109,10 @@ function App() {
   const createPayablePost = async () => {
     if (!postModel) {
       console.error("postModel undefined");
+      return;
+    }
+    if (!pkh) {
+      console.error("need to create capability");
       return;
     }
 
@@ -182,6 +190,10 @@ function App() {
   const monetizePost = async () => {
     if (!postModel) {
       console.error("postModel undefined");
+      return;
+    }
+    if (!pkh) {
+      console.error("need to create capability");
       return;
     }
     if (!currentStreamId) {

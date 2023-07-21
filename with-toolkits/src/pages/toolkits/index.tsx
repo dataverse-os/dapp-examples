@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { useWallet, useStream } from "../../hooks";
+import { useWallet, useStream } from "@dataverse/hooks";
 import { useConfig } from "../../context/configContext";
 import {
   PushNotificationClient,
@@ -41,7 +41,7 @@ import { Model } from "@dataverse/model-parser";
 const TEN_MINUTES = 10 * 60;
 
 function Toolkits() {
-  const { coreConnector, modelParser } = useConfig();
+  const { dataverseConnector, modelParser } = useConfig();
   const [postModel, setPostModel] = useState<Model>();
   const pushChatClientRef = useRef<PushChatClient>();
   const pushNotificationClientRef = useRef<PushNotificationClient>();
@@ -64,8 +64,11 @@ function Toolkits() {
   const [profileIdPointed, setProfileIdPointed] = useState<string>();
   const [pubIdPointed, setPubIdPointed] = useState<string>();
 
-  const { address, connectWallet, switchNetwork } = useWallet();
-  const { pkh, createCapability } = useStream();
+  const { address, connectWallet, switchNetwork } = useWallet(dataverseConnector);
+  const { pkh, createCapability } = useStream({
+    dataverseConnector,
+    appId: modelParser.appId
+  });
 
   useEffect(() => {
     const postModel = modelParser.getModelByName("post");
@@ -97,7 +100,7 @@ function Toolkits() {
 
     if (pushChatMessageModel) {
       const pushChatClient = new PushChatClient({
-        coreConnector,
+        dataverseConnector,
         modelIds: {
           [PushModelType.MESSAGE]: pushChatMessageModel?.streams[0].modelId!,
           [PushModelType.USER_PGP_KEY]: pushChatGPGKeyModel?.streams[0].modelId!,
@@ -111,7 +114,7 @@ function Toolkits() {
 
     if (pushNotificationModel) {
       const pushNotificationClient = new PushNotificationClient({
-        coreConnector,
+        dataverseConnector,
         modelIds: {
           [PushModelType.MESSAGE]: pushChatMessageModel?.streams[0].modelId!,
           [PushModelType.USER_PGP_KEY]: pushChatGPGKeyModel?.streams[0].modelId!,
@@ -125,7 +128,7 @@ function Toolkits() {
 
     if (tablelandModel) {
       const tablelandClient = new TablelandClient({
-        coreConnector,
+        dataverseConnector,
         network: Network.MUMBAI,
         modelId: tablelandModel?.streams[0].modelId,
       });
@@ -135,7 +138,7 @@ function Toolkits() {
     if (livepeerModel) {
       const livepeerClient = new LivepeerClient({
         apiKey: (import.meta as any).env.VITE_LIVEPEER_API_KEY,
-        coreConnector,
+        dataverseConnector,
         modelId: livepeerModel.streams[0].modelId,
       });
       livepeerClientRef.current = livepeerClient;
@@ -143,7 +146,7 @@ function Toolkits() {
 
     if (xmtpkeycacheModel && xmtpmessageModel) {
       const xmtpClient = new XmtpClient({
-        coreConnector,
+        dataverseConnector,
         modelIds: {
           [XmtpModelType.MESSAGE]: xmtpmessageModel.streams[0].modelId,
           [XmtpModelType.KEYS_CACHE]: xmtpkeycacheModel.streams[0].modelId,
@@ -159,7 +162,7 @@ function Toolkits() {
           [LensModelType.Publication]: lenspostModel.streams[0].modelId,
           [LensModelType.Collection]: lenscollectionModel.streams[0].modelId,
         },
-        coreConnector,
+        dataverseConnector,
         network: LensNetwork.SandboxMumbaiTestnet,
       });
       lensClientRef.current = lensClient;
@@ -167,7 +170,7 @@ function Toolkits() {
 
     if (snapshotproposalModel) {
       const snapshotClient = new SnapshotClient({
-        coreConnector,
+        dataverseConnector,
         modelIds: {
           [snapshotModelType.PROPOSAL]: snapshotproposalModel?.streams[0].modelId!,
           [snapshotModelType.VOTE]: snapshotvoteModel?.streams[0].modelId!,

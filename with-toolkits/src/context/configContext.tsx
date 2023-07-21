@@ -1,15 +1,15 @@
 import React, { ReactNode, createContext, useContext } from "react";
-import { Extension, CoreConnector } from "@dataverse/core-connector";
+import { Extension, DataverseConnector } from "@dataverse/dataverse-connector";
 import { ModelParser, Output } from "@dataverse/model-parser";
 import app from "../../output/app.json";
 
 interface ContextType {
-  coreConnector: CoreConnector;
+  dataverseConnector: DataverseConnector;
   appVersion: string;
   modelParser: ModelParser;
 }
 
-const coreConnector = new CoreConnector(Extension);
+const dataverseConnector = new DataverseConnector(Extension);
 const appVersion = "0.0.1";
 const modelParser = new ModelParser(app as Output);
 
@@ -19,7 +19,7 @@ export const ConfigProvider = ({ children }: { children: ReactNode }) => {
   return (
     <ConfigContext.Provider
       value={{
-        coreConnector,
+        dataverseConnector,
         appVersion,
         modelParser,
       }}
