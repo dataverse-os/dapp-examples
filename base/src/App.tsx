@@ -1,10 +1,7 @@
 import "./App.css";
 import React, { useState, useEffect } from "react";
 import ReactJson from "react-json-view";
-import {
-  Currency,
-  DataverseConnector,
-} from "@dataverse/dataverse-connector";
+import { Currency, DataverseConnector } from "@dataverse/dataverse-connector";
 import {
   useApp,
   useCreateEncryptedStream,
@@ -35,13 +32,15 @@ function App() {
   /**
    * @summary import from @dataverse/hooks
    */
-  const { address, pkh, streamsMap: posts } = useStore();
+  const {
+    state: { address, pkh, streamsMap: posts },
+  } = useStore();
 
   const { connectApp } = useApp({
     dataverseConnector,
     onSuccess: (result) => {
       console.log("[connect]connect app success, result:", result);
-    }
+    },
   });
 
   const { result: publicPost, createPublicStream } = useCreatePublicStream({
@@ -56,7 +55,10 @@ function App() {
     useCreateEncryptedStream({
       dataverseConnector,
       onSuccess: (result: any) => {
-        console.log("[createEncryptedPost]create encrypted stream success:", result);
+        console.log(
+          "[createEncryptedPost]create encrypted stream success:",
+          result
+        );
         setCurrentStreamId(result.streamId);
       },
     });
