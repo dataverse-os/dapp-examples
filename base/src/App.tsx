@@ -1,7 +1,7 @@
 import "./App.css";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import ReactJson from "react-json-view";
-import { Currency, DataverseConnector } from "@dataverse/dataverse-connector";
+import { Currency } from "@dataverse/dataverse-connector";
 import {
   useApp,
   useCreateEncryptedStream,
@@ -18,7 +18,6 @@ import { Model, ModelParser, Output } from "@dataverse/model-parser";
 import app from "../output/app.json";
 import pacakage from "../package.json";
 
-const dataverseConnector = new DataverseConnector();
 const appVersion = pacakage.version;
 const modelParser = new ModelParser(app as Output);
 
@@ -38,7 +37,6 @@ function App() {
   } = useStore();
 
   const { connectApp } = useApp({
-    dataverseConnector,
     onSuccess: (result) => {
       console.log("[connect]connect app success, result:", result);
     },
@@ -99,13 +97,13 @@ function App() {
   /**
    * @summary custom methods
    */
-  const connect = async () => {
+  const connect = useCallback(async () => {
     connectApp({
       appId: modelParser.appId,
     });
-  };
+  }, [modelParser]);
 
-  const createPublicPost = async () => {
+  const createPublicPost = useCallback(async () => {
     if (!postModel) {
       console.error("postModel undefined");
       return;
@@ -124,9 +122,9 @@ function App() {
         updatedAt: new Date().toISOString(),
       },
     });
-  };
+  }, [postModel]);
 
-  const createEncryptedPost = async () => {
+  const createEncryptedPost = useCallback(async () => {
     if (!postModel) {
       console.error("postModel undefined");
       return;
@@ -152,29 +150,17 @@ function App() {
         videos: false,
       },
     });
-  };
+  }, [postModel]);
 
-  const createPayablePost = async () => {
+  const createPayablePost = useCallback(async () => {
     if (!postModel) {
       console.error("postModel undefined");
       return;
     }
 
-    if (!address || !pkh) {
-      console.error("need connect app first");
-      return;
-    }
-
-    const profileIds = await dataverseConnector.getProfiles(address);
-    if (profileIds.length == 0) {
-      console.error("no available lens profiles");
-      return;
-    }
-    const profileId = profileIds[0].id;
     const date = new Date().toISOString();
     createPayableStream({
       modelId: postModel.streams[postModel.streams.length - 1].modelId,
-      profileId,
       stream: {
         appVersion,
         text: "metaverse",
@@ -194,25 +180,25 @@ function App() {
         videos: false,
       },
     });
-  };
+  }, [postModel, address, pkh]);
 
-  const loadPosts = async () => {
+  const loadPosts = useCallback(async () => {
     if (!postModel) {
       console.error("postModel undefined");
       return;
     }
-    if(!pkh) {
+    if (!pkh) {
       console.error("pkh undefined");
       return;
     }
 
     await loadStreamsBy({
       pkh,
-      modelId: postModel.streams[0].modelId,
+      modelId: postModel.streams[postModel.streams.length - 1].modelId,
     });
-  };
+  }, [postModel, pkh]);
 
-  const updatePost = async () => {
+  const updatePost = useCallback(async () => {
     if (!postModel) {
       console.error("postModel undefined");
       return;
@@ -236,43 +222,33 @@ function App() {
         videos: false,
       },
     });
-  };
+  }, [postModel, currentStreamId]);
 
-  const monetizePost = async () => {
+  const monetizePost = useCallback(async () => {
     if (!postModel) {
       console.error("postModel undefined");
-      return;
-    }
-    if (!pkh || !address) {
-      console.error("need connect app first");
       return;
     }
     if (!currentStreamId) {
       console.error("currentStreamId undefined");
       return;
     }
-    const profileIds = await dataverseConnector.getProfiles(address);
-    if (profileIds.length == 0) {
-      console.error("no available lens profiles");
-      return;
-    }
-    const profileId = profileIds[0].id;
+
     monetizeStream({
       streamId: currentStreamId,
-      profileId,
       currency: Currency.WMATIC,
       amount: 0.0001,
       collectLimit: 1000,
     });
-  };
+  }, [postModel, currentStreamId]);
 
-  const unlockPost = async () => {
+  const unlockPost = useCallback(async () => {
     if (!currentStreamId) {
       console.error("currentStreamId undefined");
       return;
     }
     unlockStream(currentStreamId);
-  };
+  }, [currentStreamId]);
 
   return (
     <>
