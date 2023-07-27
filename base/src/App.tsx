@@ -7,7 +7,8 @@ import {
   useCreateEncryptedStream,
   useCreatePayableStream,
   useCreatePublicStream,
-  useLoadStreams,
+  // useLoadStreams,
+  useLoadStreamsBy,
   useMonetizeStream,
   useStore,
   useUnlockStream,
@@ -44,7 +45,6 @@ function App() {
   });
 
   const { result: publicPost, createPublicStream } = useCreatePublicStream({
-    dataverseConnector,
     onSuccess: (result: any) => {
       console.log("[createPublicPost]create public stream success:", result);
       setCurrentStreamId(result.streamId);
@@ -53,7 +53,6 @@ function App() {
 
   const { result: encryptedPost, createEncryptedStream } =
     useCreateEncryptedStream({
-      dataverseConnector,
       onSuccess: (result: any) => {
         console.log(
           "[createEncryptedPost]create encrypted stream success:",
@@ -64,15 +63,13 @@ function App() {
     });
 
   const { result: payablePost, createPayableStream } = useCreatePayableStream({
-    dataverseConnector,
     onSuccess: (result: any) => {
       console.log("[createPayablePost]create payable stream success:", result);
       setCurrentStreamId(result.streamId);
     },
   });
 
-  const { loadStreams } = useLoadStreams({
-    dataverseConnector,
+  const { loadStreamsBy } = useLoadStreamsBy({
     onError: (error) => {
       console.error("[loadPosts]load streams failed,", error);
     },
@@ -82,21 +79,18 @@ function App() {
   });
 
   const { result: updatedPost, updateStream } = useUpdateStream({
-    dataverseConnector,
     onSuccess: (result) => {
       console.log("[updatePost]update stream success, result:", result);
     },
   });
 
   const { result: monetizedPost, monetizeStream } = useMonetizeStream({
-    dataverseConnector,
     onSuccess: (result) => {
       console.log("[monetize]monetize stream success, result:", result);
     },
   });
 
   const { result: unlockedPost, unlockStream } = useUnlockStream({
-    dataverseConnector,
     onSuccess: (result) => {
       console.log("[unlockPost]unlock stream success, result:", result);
     },
@@ -105,7 +99,7 @@ function App() {
   /**
    * @summary custom methods
    */
-  const connect = () => {
+  const connect = async () => {
     connectApp({
       appId: modelParser.appId,
     });
@@ -207,8 +201,12 @@ function App() {
       console.error("postModel undefined");
       return;
     }
+    if(!pkh) {
+      console.error("pkh undefined");
+      return;
+    }
 
-    await loadStreams({
+    await loadStreamsBy({
       pkh,
       modelId: postModel.streams[0].modelId,
     });
