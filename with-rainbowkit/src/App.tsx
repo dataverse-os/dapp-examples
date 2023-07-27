@@ -1,4 +1,5 @@
 import "./App.css";
+import "@rainbow-me/rainbowkit/styles.css";
 import React, { useState, useEffect } from "react";
 import ReactJson from "react-json-view";
 import { Currency, DataverseConnector } from "@dataverse/dataverse-connector";
@@ -16,6 +17,7 @@ import {
 import { Model, ModelParser, Output } from "@dataverse/model-parser";
 import app from "../output/app.json";
 import pacakage from "../package.json";
+import { ConnectButton } from "@rainbow-me/rainbowkit";
 
 const dataverseConnector = new DataverseConnector();
 const appVersion = pacakage.version;
@@ -278,6 +280,9 @@ function App() {
 
   return (
     <>
+      <div className="connect-button">
+        <ConnectButton />
+      </div>
       <button onClick={connect}>connect</button>
       <div className="black-text">{pkh}</div>
       <hr />

@@ -62,3 +62,9 @@ button {
   font-size: 12px;
   text-align: start;
 }
+
+.connect-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

@@ -826,7 +826,7 @@ function Toolkits() {
   return (
     <div className="App">
       <button onClick={connect}>connect</button>
-      <div className="blackText">{pkh}</div>
+      <div className="black-text">{pkh}</div>
       <hr />
 
       <h2 className="label">Push Channel</h2>
