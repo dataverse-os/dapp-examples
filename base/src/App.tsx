@@ -3,12 +3,10 @@ import React, { useState, useEffect, useCallback } from "react";
 import ReactJson from "react-json-view";
 import { Currency } from "@dataverse/dataverse-connector";
 import {
+  StreamType,
   useApp,
-  useCreateEncryptedStream,
-  useCreatePayableStream,
-  useCreatePublicStream,
-  // useLoadStreams,
-  useLoadStreamsBy,
+  useCreateStream,
+  useFeedsByAddress,
   useMonetizeStream,
   useStore,
   useUnlockStream,
@@ -21,9 +19,10 @@ import pacakage from "../package.json";
 const appVersion = pacakage.version;
 const modelParser = new ModelParser(app as Output);
 
-function App() {
+const App = () => {
   const [postModel, setPostModel] = useState<Model>();
   const [currentStreamId, setCurrentStreamId] = useState<string>();
+
   useEffect(() => {
     const postModel = modelParser.getModelByName("post");
     setPostModel(postModel);
@@ -42,15 +41,17 @@ function App() {
     },
   });
 
-  const { result: publicPost, createPublicStream } = useCreatePublicStream({
+  const { createdStream: publicPost, createStream: createPublicStream } = useCreateStream({
+    streamType: StreamType.Public,
     onSuccess: (result: any) => {
       console.log("[createPublicPost]create public stream success:", result);
       setCurrentStreamId(result.streamId);
     },
   });
 
-  const { result: encryptedPost, createEncryptedStream } =
-    useCreateEncryptedStream({
+  const { createdStream: encryptedPost, createStream: createEncryptedStream } =
+    useCreateStream({
+      streamType: StreamType.Encrypted,
       onSuccess: (result: any) => {
         console.log(
           "[createEncryptedPost]create encrypted stream success:",
@@ -60,14 +61,15 @@ function App() {
       },
     });
 
-  const { result: payablePost, createPayableStream } = useCreatePayableStream({
+  const { createdStream: payablePost, createStream: createPayableStream } = useCreateStream({
+    streamType: StreamType.Payable,
     onSuccess: (result: any) => {
       console.log("[createPayablePost]create payable stream success:", result);
       setCurrentStreamId(result.streamId);
     },
   });
 
-  const { loadStreamsBy } = useLoadStreamsBy({
+  const { loadFeedsByAddress } = useFeedsByAddress({
     onError: (error) => {
       console.error("[loadPosts]load streams failed,", error);
     },
@@ -76,19 +78,19 @@ function App() {
     },
   });
 
-  const { result: updatedPost, updateStream } = useUpdateStream({
+  const { updatedStreamContent: updatedPost, updateStream } = useUpdateStream({
     onSuccess: (result) => {
       console.log("[updatePost]update stream success, result:", result);
     },
   });
 
-  const { result: monetizedPost, monetizeStream } = useMonetizeStream({
+  const { monetizedStreamContent: monetizedPost, monetizeStream } = useMonetizeStream({
     onSuccess: (result) => {
       console.log("[monetize]monetize stream success, result:", result);
     },
   });
 
-  const { result: unlockedPost, unlockStream } = useUnlockStream({
+  const { unlockedStreamContent: unlockedPost, unlockStream } = useUnlockStream({
     onSuccess: (result) => {
       console.log("[unlockPost]unlock stream success, result:", result);
     },
@@ -110,7 +112,7 @@ function App() {
     }
 
     createPublicStream({
-      model: postModel,
+      modelId: "kjzl6hvfrbw6c881rsaumrxv0n7yrnm5xppb7h3hvy1ixy8kqlxlo5q8j7ffjk6",
       stream: {
         appVersion,
         text: "hello",
@@ -192,7 +194,7 @@ function App() {
       return;
     }
 
-    await loadStreamsBy({
+    await loadFeedsByAddress({
       pkh,
       modelId: postModel.streams[postModel.streams.length - 1].modelId,
     });
