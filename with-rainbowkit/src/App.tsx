@@ -1,14 +1,14 @@
 import "./App.css";
 import "@rainbow-me/rainbowkit/styles.css";
-import React, { useState, useEffect } from "react";
+import { ConnectButton } from "@rainbow-me/rainbowkit";
+import React, { useState, useEffect, useCallback } from "react";
 import ReactJson from "react-json-view";
-import { Currency, DataverseConnector } from "@dataverse/dataverse-connector";
+import { Currency } from "@dataverse/dataverse-connector";
 import {
+  StreamType,
   useApp,
-  useCreateEncryptedStream,
-  useCreatePayableStream,
-  useCreatePublicStream,
-  useLoadStreams,
+  useCreateStream,
+  useFeedsByAddress,
   useMonetizeStream,
   useStore,
   useUnlockStream,
@@ -17,15 +17,14 @@ import {
 import { Model, ModelParser, Output } from "@dataverse/model-parser";
 import app from "../output/app.json";
 import pacakage from "../package.json";
-import { ConnectButton } from "@rainbow-me/rainbowkit";
 
-const dataverseConnector = new DataverseConnector();
 const appVersion = pacakage.version;
 const modelParser = new ModelParser(app as Output);
 
-function App() {
+const App = () => {
   const [postModel, setPostModel] = useState<Model>();
   const [currentStreamId, setCurrentStreamId] = useState<string>();
+
   useEffect(() => {
     const postModel = modelParser.getModelByName("post");
     setPostModel(postModel);
@@ -39,23 +38,22 @@ function App() {
   } = useStore();
 
   const { connectApp } = useApp({
-    dataverseConnector,
     onSuccess: (result) => {
       console.log("[connect]connect app success, result:", result);
     },
   });
 
-  const { result: publicPost, createPublicStream } = useCreatePublicStream({
-    dataverseConnector,
+  const { createdStream: publicPost, createStream: createPublicStream } = useCreateStream({
+    streamType: StreamType.Public,
     onSuccess: (result: any) => {
       console.log("[createPublicPost]create public stream success:", result);
       setCurrentStreamId(result.streamId);
     },
   });
 
-  const { result: encryptedPost, createEncryptedStream } =
-    useCreateEncryptedStream({
-      dataverseConnector,
+  const { createdStream: encryptedPost, createStream: createEncryptedStream } =
+    useCreateStream({
+      streamType: StreamType.Encrypted,
       onSuccess: (result: any) => {
         console.log(
           "[createEncryptedPost]create encrypted stream success:",
@@ -65,16 +63,15 @@ function App() {
       },
     });
 
-  const { result: payablePost, createPayableStream } = useCreatePayableStream({
-    dataverseConnector,
+  const { createdStream: payablePost, createStream: createPayableStream } = useCreateStream({
+    streamType: StreamType.Payable,
     onSuccess: (result: any) => {
       console.log("[createPayablePost]create payable stream success:", result);
       setCurrentStreamId(result.streamId);
     },
   });
 
-  const { loadStreams } = useLoadStreams({
-    dataverseConnector,
+  const { loadFeedsByAddress } = useFeedsByAddress({
     onError: (error) => {
       console.error("[loadPosts]load streams failed,", error);
     },
@@ -83,22 +80,19 @@ function App() {
     },
   });
 
-  const { result: updatedPost, updateStream } = useUpdateStream({
-    dataverseConnector,
+  const { updatedStreamContent: updatedPost, updateStream } = useUpdateStream({
     onSuccess: (result) => {
       console.log("[updatePost]update stream success, result:", result);
     },
   });
 
-  const { result: monetizedPost, monetizeStream } = useMonetizeStream({
-    dataverseConnector,
+  const { monetizedStreamContent: monetizedPost, monetizeStream } = useMonetizeStream({
     onSuccess: (result) => {
       console.log("[monetize]monetize stream success, result:", result);
     },
   });
 
-  const { result: unlockedPost, unlockStream } = useUnlockStream({
-    dataverseConnector,
+  const { unlockedStreamContent: unlockedPost, unlockStream } = useUnlockStream({
     onSuccess: (result) => {
       console.log("[unlockPost]unlock stream success, result:", result);
     },
@@ -107,20 +101,20 @@ function App() {
   /**
    * @summary custom methods
    */
-  const connect = () => {
+  const connect = useCallback(async () => {
     connectApp({
       appId: modelParser.appId,
     });
-  };
+  }, [modelParser]);
 
-  const createPublicPost = async () => {
+  const createPublicPost = useCallback(async () => {
     if (!postModel) {
       console.error("postModel undefined");
       return;
     }
 
     createPublicStream({
-      model: postModel,
+      modelId: "kjzl6hvfrbw6c881rsaumrxv0n7yrnm5xppb7h3hvy1ixy8kqlxlo5q8j7ffjk6",
       stream: {
         appVersion,
         text: "hello",
@@ -132,9 +126,9 @@ function App() {
         updatedAt: new Date().toISOString(),
       },
     });
-  };
+  }, [postModel]);
 
-  const createEncryptedPost = async () => {
+  const createEncryptedPost = useCallback(async () => {
     if (!postModel) {
       console.error("postModel undefined");
       return;
@@ -160,29 +154,17 @@ function App() {
         videos: false,
       },
     });
-  };
+  }, [postModel]);
 
-  const createPayablePost = async () => {
+  const createPayablePost = useCallback(async () => {
     if (!postModel) {
       console.error("postModel undefined");
       return;
     }
 
-    if (!address || !pkh) {
-      console.error("need connect app first");
-      return;
-    }
-
-    const profileIds = await dataverseConnector.getProfiles(address);
-    if (profileIds.length == 0) {
-      console.error("no available lens profiles");
-      return;
-    }
-    const profileId = profileIds[0].id;
     const date = new Date().toISOString();
     createPayableStream({
       modelId: postModel.streams[postModel.streams.length - 1].modelId,
-      profileId,
       stream: {
         appVersion,
         text: "metaverse",
@@ -202,21 +184,25 @@ function App() {
         videos: false,
       },
     });
-  };
+  }, [postModel, address, pkh]);
 
-  const loadPosts = async () => {
+  const loadPosts = useCallback(async () => {
     if (!postModel) {
       console.error("postModel undefined");
       return;
     }
+    if (!pkh) {
+      console.error("pkh undefined");
+      return;
+    }
 
-    await loadStreams({
+    await loadFeedsByAddress({
       pkh,
-      modelId: postModel.streams[0].modelId,
+      modelId: postModel.streams[postModel.streams.length - 1].modelId,
     });
-  };
+  }, [postModel, pkh]);
 
-  const updatePost = async () => {
+  const updatePost = useCallback(async () => {
     if (!postModel) {
       console.error("postModel undefined");
       return;
@@ -240,47 +226,37 @@ function App() {
         videos: false,
       },
     });
-  };
+  }, [postModel, currentStreamId]);
 
-  const monetizePost = async () => {
+  const monetizePost = useCallback(async () => {
     if (!postModel) {
       console.error("postModel undefined");
-      return;
-    }
-    if (!pkh || !address) {
-      console.error("need connect app first");
       return;
     }
     if (!currentStreamId) {
       console.error("currentStreamId undefined");
       return;
     }
-    const profileIds = await dataverseConnector.getProfiles(address);
-    if (profileIds.length == 0) {
-      console.error("no available lens profiles");
-      return;
-    }
-    const profileId = profileIds[0].id;
+
     monetizeStream({
       streamId: currentStreamId,
-      profileId,
       currency: Currency.WMATIC,
       amount: 0.0001,
       collectLimit: 1000,
     });
-  };
+  }, [postModel, currentStreamId]);
 
-  const unlockPost = async () => {
+  const unlockPost = useCallback(async () => {
     if (!currentStreamId) {
       console.error("currentStreamId undefined");
       return;
     }
     unlockStream(currentStreamId);
-  };
+  }, [currentStreamId]);
 
   return (
     <>
-      <div className="connect-button">
+          <div className="connect-button">
         <ConnectButton />
       </div>
       <button onClick={connect}>connect</button>
@@ -337,3 +313,5 @@ function App() {
 }
 
 export default App;
+
+
