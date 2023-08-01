@@ -112,7 +112,7 @@ const App = () => {
     }
 
     createPublicStream({
-      modelId: "kjzl6hvfrbw6c881rsaumrxv0n7yrnm5xppb7h3hvy1ixy8kqlxlo5q8j7ffjk6",
+      modelId: postModel.streams[postModel.streams.length - 1].modelId,
       stream: {
         appVersion,
         text: "hello",
