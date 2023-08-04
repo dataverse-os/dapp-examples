@@ -1,4 +1,3 @@
-import "./App.css";
 import React, { useState, useEffect, useCallback, useContext } from "react";
 import ReactJson from "react-json-view";
 import { Currency } from "@dataverse/dataverse-connector";
@@ -301,8 +300,10 @@ const App = () => {
           <ReactJson src={unlockedPost} collapsed={true} />
         </div>
       )}
-      <br />
+      <hr />
       <button onClick={() => navigate("/folder")}>Go To Folder Page</button>
+      <button onClick={() => navigate("/file")}>Go To File Page</button>
+      <br />
     </>
   );
 }

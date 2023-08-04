@@ -1,13 +1,15 @@
-import React, {  } from "react";
+import React, { } from "react";
 import ReactDOM from "react-dom/client";
-import App from "./pages/App/App";
-import "./index.css";
 import { DataverseContextProvider } from "@dataverse/hooks";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { ModelParser, Output } from "@dataverse/model-parser";
+import App from "./pages/App";
+import Folder from "./pages/Folder";
+import File from "./pages/File";
 import app from "../output/app.json";
 import pacakage from "../package.json";
-import { ModelParser, Output } from "@dataverse/model-parser";
-import Folder from "./pages/Folder";
+import "./index.css";
+import "./global.css";
 
 const appVersion = pacakage.version;
 const modelParser = new ModelParser(app as Output);
@@ -26,6 +28,7 @@ const Index = () => {
       <Routes>
         <Route path="/" element={<App />} />
         <Route path="/folder" element={<Folder />} />
+        <Route path="/file" element={<File />} />
       </Routes>
     </AppContext.Provider>
   </BrowserRouter>
