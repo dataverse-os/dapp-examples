@@ -24,10 +24,10 @@ In this example, each toolkit has its own models. In addition to the `post` and 
 
 ### 1.Prepare
 
-Before running example, you need to install `dataverseos-cmd`.
+Before running example, you need to install `create-dataverse-app`.
 
 ```
-pnpm install -g dataverseos-cmd
+pnpm install -g create-dataverse-app
 ```
 
 Here we use `base` as an example.
