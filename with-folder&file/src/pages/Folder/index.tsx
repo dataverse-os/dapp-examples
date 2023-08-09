@@ -20,7 +20,7 @@ const Folder = () => {
    * @summary import from @dataverse/hooks
    */
   const {
-    state: { pkh, folderMap },
+    pkh, folderMap
   } = useStore();
 
   const { connectApp } = useApp({
