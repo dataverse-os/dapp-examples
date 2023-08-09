@@ -1,7 +1,7 @@
 export const config = {
   name: "dataverse_app_base_example", // app name should NOT contain "-"
   logo: "https://bafybeifozdhcbbfydy2rs6vbkbbtj3wc4vjlz5zg2cnqhb2g4rm2o5ldna.ipfs.w3s.link/dataverse.svg",
-  website: ["https://dataverse-os.com"], // you can use localhost:(port) for testing
+  website: ["localhost:5173"], // you can use localhost:(port) for testing
   defaultFolderName: "Main",
   description: "This is dataverse app example.",
   models: [
