@@ -1,4 +1,3 @@
-import "./App.css";
 import "@rainbow-me/rainbowkit/styles.css";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import React, { useState, useEffect, useCallback } from "react";
@@ -34,7 +33,7 @@ const App = () => {
    * @summary import from @dataverse/hooks
    */
   const {
-    state: { address, pkh, streamsMap: posts },
+    address, pkh, streamsMap: posts
   } = useStore();
 
   const { connectApp } = useApp({
@@ -256,7 +255,7 @@ const App = () => {
 
   return (
     <>
-          <div className="connect-button">
+      <div className="connect-button">
         <ConnectButton />
       </div>
       <button onClick={connect}>connect</button>

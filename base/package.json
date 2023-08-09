@@ -11,8 +11,8 @@
   "license": "MIT",
   "dependencies": {
     "@composedb/devtools": "^0.4.4",
-    "@dataverse/dataverse-connector": "^1.0.18",
-    "@dataverse/hooks": "^1.0.7",
+    "@dataverse/dataverse-connector": "^1.0.24",
+    "@dataverse/hooks": "^1.0.19",
     "@dataverse/model-parser": "^1.0.2",
     "ethers": "5.6.9",
     "path": "^0.12.7",

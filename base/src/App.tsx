@@ -32,7 +32,7 @@ const App = () => {
    * @summary import from @dataverse/hooks
    */
   const {
-    state: { address, pkh, streamsMap: posts },
+    address, pkh, streamsMap: posts
   } = useStore();
 
   const { connectApp } = useApp({
