@@ -1,6 +1,10 @@
-import React, { useCallback, useContext } from "react";
+import React, { useCallback, useContext, useMemo } from "react";
 import ReactJson from "react-json-view";
-import { Currency, MirrorFile, StorageProviderName } from "@dataverse/dataverse-connector";
+import {
+  Currency,
+  MirrorFile,
+  StorageProviderName,
+} from "@dataverse/dataverse-connector";
 import {
   useApp,
   useMonetizeFile,
@@ -18,9 +22,22 @@ const File = () => {
   /**
    * @summary import from @dataverse/hooks
    */
-  const {
-    pkh, folderMap
-  } = useStore();
+  const { pkh, folderMap } = useStore();
+
+  const currentFolderId = useMemo(() => {
+    const sortedFolerIds = Object.keys(folderMap)
+      .filter(
+        (el) =>
+          folderMap[el].options.folderName !=
+          modelParser.output.defaultFolderName
+      )
+      .sort(
+        (a, b) =>
+          Date.parse(folderMap[b].createdAt) -
+          Date.parse(folderMap[a].createdAt)
+      );
+    return sortedFolerIds[0];
+  }, [folderMap]);
 
   const { connectApp } = useApp({
     onSuccess: (result) => {
@@ -31,32 +48,35 @@ const File = () => {
   const { uploadFile, uploadedFile } = useUploadFile({
     onSuccess: (result) => {
       console.log("[uploadFile]upload file success, result:", result);
-    }
-  })
+    },
+  });
 
   const { updateFileBaseInfo, updatedFile } = useUpdateFileBaseInfo({
     onSuccess: (result) => {
-      console.log("[updateFileBaseInfo]update file base info success, result:", result);
-    }
-  })
+      console.log(
+        "[updateFileBaseInfo]update file base info success, result:",
+        result
+      );
+    },
+  });
 
   const { moveFiles, movedFiles } = useMoveFiles({
     onSuccess: (result) => {
       console.log("[moveFiles]move files success, result:", result);
-    }
-  })
+    },
+  });
 
   const { removeFiles, removedFiles } = useRemoveFiles({
     onSuccess: (result) => {
       console.log("[removeFiles]remove files success, result:", result);
-    }
-  })
+    },
+  });
 
   const { monetizeFile, monetizedFile } = useMonetizeFile({
     onSuccess: (result) => {
       console.log("[monetizeFile]monetize file success, result:", result);
-    }
-  })
+    },
+  });
 
   /**
    * @summary custom methods
@@ -68,19 +88,21 @@ const File = () => {
   }, [modelParser]);
 
   const handleUploadFile = useCallback(async () => {
+    const name = StorageProviderName.Web3Storage;
+    const apiKey =
+      name === StorageProviderName.Web3Storage
+        ? (import.meta as any).env.VITE_WEB3_STORAGE_API_KEY
+        : (import.meta as any).env.VITE_LIGHTHOUSE_API_KEY;
     uploadFile({
-      // TODO: folder id
-      folderId: "",
-      fileName: 'example.txt',
-      fileBase64: 'dGVzdA==',
+      fileName: "example.txt",
+      fileBase64: "dGVzdA==",
       encrypted: false,
       storageProvider: {
-        name: StorageProviderName.Web3Storage,
-        // TODO: your api token
-        apiKey: ''
+        name,
+        apiKey,
       },
-      reRender: true
-    })
+      reRender: true,
+    });
   }, []);
 
   const handleUpdateFileBaseInfo = useCallback(async () => {
@@ -92,9 +114,9 @@ const File = () => {
     updateFileBaseInfo({
       indexFileId: result.indexFileId,
       fileInfo: {
-        note: 'changed note'
-      }
-    })
+        note: "changed note",
+      },
+    });
   }, [uploadedFile]);
 
   const handleMoveFiles = useCallback(async () => {
@@ -102,12 +124,17 @@ const File = () => {
       console.error("uploadedFile undefined");
       return;
     }
+    if (!currentFolderId) {
+      console.error("currentFolerId undefined, please readAllFolders first!");
+      return;
+    } else {
+      console.log("currentFolerId:", currentFolderId)
+    }
     const file = uploadedFile as MirrorFile;
     moveFiles({
       sourceIndexFileIds: [file.indexFileId],
-      // TODO: target folder id
-      targetFolderId: ""
-    })
+      targetFolderId: currentFolderId,
+    });
   }, [uploadedFile]);
 
   const handleRemoveFiles = useCallback(async () => {
@@ -118,7 +145,7 @@ const File = () => {
     const file = uploadedFile as MirrorFile;
     removeFiles({
       indexFileIds: [file.indexFileId],
-    })
+    });
   }, [uploadedFile]);
 
   const handleMonetizeFile = useCallback(async () => {
@@ -132,7 +159,7 @@ const File = () => {
       currency: Currency.WMATIC,
       amount: 0.0001,
       collectLimit: 10,
-    })
+    });
   }, [uploadedFile]);
 
   return (
@@ -178,6 +205,6 @@ const File = () => {
       <br />
     </>
   );
-}
+};
 
 export default File;
