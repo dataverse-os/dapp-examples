@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef } from "react";
-import { useWallet, useStream } from "@dataverse/hooks";
+import React, { useState, useEffect, useRef, useCallback } from "react";
+import { useApp, useStore } from "@dataverse/hooks";
 import { useConfig } from "../../context/configContext";
 import {
   PushNotificationClient,
@@ -35,13 +35,13 @@ import SnapshotClient, {
 import { LivepeerWidget, LivepeerPlayer } from "../../components/Livepeer";
 import { ethers } from "ethers";
 import ReactJson from "react-json-view";
-import { Currency } from "@dataverse/core-connector";
 import { Model } from "@dataverse/model-parser";
+import { Currency } from "@dataverse/dataverse-connector";
 
 const TEN_MINUTES = 10 * 60;
 
 function Toolkits() {
-  const { dataverseConnector, modelParser } = useConfig();
+  const { walletProvider, modelParser } = useConfig();
   const [postModel, setPostModel] = useState<Model>();
   const pushChatClientRef = useRef<PushChatClient>();
   const pushNotificationClientRef = useRef<PushNotificationClient>();
@@ -64,11 +64,12 @@ function Toolkits() {
   const [profileIdPointed, setProfileIdPointed] = useState<string>();
   const [pubIdPointed, setPubIdPointed] = useState<string>();
 
-  const { address, connectWallet, switchNetwork } = useWallet(dataverseConnector);
-  const { pkh, createCapability } = useStream({
-    dataverseConnector,
-    appId: modelParser.appId
-  });
+  /**
+   * @summary import from @dataverse/hooks
+   */
+  const {
+    address, pkh, dataverseConnector
+  } = useStore();
 
   useEffect(() => {
     const postModel = modelParser.getModelByName("post");
@@ -129,6 +130,7 @@ function Toolkits() {
     if (tablelandModel) {
       const tablelandClient = new TablelandClient({
         dataverseConnector,
+        walletProvider,
         network: Network.MUMBAI,
         modelId: tablelandModel?.streams[0].modelId,
       });
@@ -163,6 +165,7 @@ function Toolkits() {
           [LensModelType.Collection]: lenscollectionModel.streams[0].modelId,
         },
         dataverseConnector,
+        walletProvider,
         network: LensNetwork.SandboxMumbaiTestnet,
       });
       lensClientRef.current = lensClient;
@@ -181,12 +184,20 @@ function Toolkits() {
     }
   }, []);
 
-  const connect = async () => {
-    const { wallet } = await connectWallet();
-    const pkh = await createCapability(wallet);
-    console.log("pkh:", pkh);
-    return pkh;
-  };
+  const { connectApp } = useApp({
+    onSuccess: (result) => {
+      console.log("[connect]connect app success, result:", result);
+    },
+  });
+
+  /**
+   * @summary custom methods
+   */
+  const connect = useCallback(async () => {
+    connectApp({
+      appId: modelParser.appId,
+    });
+  }, [modelParser]);
 
   // Push Notifications
   const getUserSubscriptions = async () => {
@@ -354,7 +365,10 @@ function Toolkits() {
 
   // Tableland
   const createTable = async () => {
-    await switchNetwork(80001);
+    await walletProvider.request({
+      method: "wallet_switchEthereumChain",
+      params: [{ chainId: "0x13881" }],
+    })
 
     const CREATE_TABLE_SQL =
       "CREATE TABLE test_table (id integer primary key, record text)";
@@ -404,6 +418,9 @@ function Toolkits() {
 
   // Xmtp
   const isUserOnNetwork = async () => {
+    if (!address) {
+      throw new Error("address undefined");
+    }
     const isOnNetwork = await xmtpClientRef.current?.isUserOnNetwork(
       address,
       "production"
@@ -717,7 +734,7 @@ function Toolkits() {
 
   /** snapshot toolkit */
   const createProposal = async () => {
-    if(!spaceId) {
+    if (!spaceId) {
       alert("please enter spaceId ...");
       return;
     }
@@ -741,7 +758,7 @@ function Toolkits() {
   }
 
   const vote = async () => {
-    if(!proposalId || !spaceId) {
+    if (!proposalId || !spaceId) {
       alert("create a proposal before vote");
       return;
     }
@@ -761,7 +778,7 @@ function Toolkits() {
   }
 
   const joinSpace = async () => {
-    if(!spaceId) {
+    if (!spaceId) {
       alert("please enter spaceId ...");
       return;
     }
@@ -773,7 +790,7 @@ function Toolkits() {
     console.log("[joinSpace]res:", res);
   }
   const getActions = async () => {
-    if(!spaceId) {
+    if (!spaceId) {
       alert("please enter spaceId ...");
       return;
     }
@@ -784,7 +801,7 @@ function Toolkits() {
       skip: 10,
       orderDirection: OrderDirection.asc
     } as GetActionParams
-    const res =  await snapshotClientRef.current!.getActions(params);
+    const res = await snapshotClientRef.current!.getActions(params);
     console.log("[getActions]", res)
   }
 
