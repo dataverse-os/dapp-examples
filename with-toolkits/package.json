@@ -12,7 +12,7 @@
   "dependencies": {
     "@composedb/devtools": "^0.4.4",
     "@dataverse/dataverse-connector": "^1.0.24",
-    "@dataverse/hooks": "^1.0.18",
+    "@dataverse/hooks": "^1.0.19",
     "@dataverse/lens-client-toolkit": "latest",
     "@dataverse/livepeer-client-toolkit": "latest",
     "@dataverse/model-parser": "latest",
