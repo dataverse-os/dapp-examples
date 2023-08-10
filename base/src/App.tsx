@@ -36,6 +36,7 @@ const App = () => {
   } = useStore();
 
   const { connectApp } = useApp({
+    appId: modelParser.appId,
     onSuccess: (result) => {
       console.log("[connect]connect app success, result:", result);
     },
@@ -100,10 +101,8 @@ const App = () => {
    * @summary custom methods
    */
   const connect = useCallback(async () => {
-    connectApp({
-      appId: modelParser.appId,
-    });
-  }, [modelParser]);
+    connectApp();
+  }, []);
 
   const createPublicPost = useCallback(async () => {
     if (!postModel) {
