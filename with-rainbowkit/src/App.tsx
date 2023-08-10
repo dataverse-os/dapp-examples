@@ -103,7 +103,7 @@ const App = () => {
    */
   const connect = useCallback(async () => {
     connectApp();
-  }, [modelParser]);
+  }, [connectApp]);
 
   const createPublicPost = useCallback(async () => {
     if (!postModel) {
@@ -112,7 +112,7 @@ const App = () => {
     }
 
     createPublicStream({
-      modelId: "kjzl6hvfrbw6c881rsaumrxv0n7yrnm5xppb7h3hvy1ixy8kqlxlo5q8j7ffjk6",
+      modelId: postModel.streams[postModel.streams.length - 1].modelId,
       stream: {
         appVersion,
         text: "hello",
@@ -124,7 +124,7 @@ const App = () => {
         updatedAt: new Date().toISOString(),
       },
     });
-  }, [postModel]);
+  }, [postModel, createPublicStream]);
 
   const createEncryptedPost = useCallback(async () => {
     if (!postModel) {
@@ -152,7 +152,7 @@ const App = () => {
         videos: false,
       },
     });
-  }, [postModel]);
+  }, [postModel, createEncryptedStream]);
 
   const createPayablePost = useCallback(async () => {
     if (!postModel) {
@@ -182,7 +182,7 @@ const App = () => {
         videos: false,
       },
     });
-  }, [postModel, address, pkh]);
+  }, [postModel, address, pkh, createPayableStream]);
 
   const loadPosts = useCallback(async () => {
     if (!postModel) {
@@ -198,7 +198,7 @@ const App = () => {
       pkh,
       modelId: postModel.streams[postModel.streams.length - 1].modelId,
     });
-  }, [postModel, pkh]);
+  }, [postModel, pkh, loadFeedsByAddress]);
 
   const updatePost = useCallback(async () => {
     if (!postModel) {
@@ -224,7 +224,7 @@ const App = () => {
         videos: false,
       },
     });
-  }, [postModel, currentStreamId]);
+  }, [postModel, currentStreamId, updateStream]);
 
   const monetizePost = useCallback(async () => {
     if (!postModel) {
@@ -242,7 +242,7 @@ const App = () => {
       amount: 0.0001,
       collectLimit: 1000,
     });
-  }, [postModel, currentStreamId]);
+  }, [postModel, currentStreamId, monetizeStream]);
 
   const unlockPost = useCallback(async () => {
     if (!currentStreamId) {
@@ -250,7 +250,7 @@ const App = () => {
       return;
     }
     unlockStream(currentStreamId);
-  }, [currentStreamId]);
+  }, [currentStreamId, unlockStream]);
 
   return (
     <>

@@ -24,6 +24,7 @@ const Folder = () => {
   } = useStore();
 
   const { connectApp } = useApp({
+    appId: modelParser.appId,
     onSuccess: (result) => {
       console.log("[connect]connect app success, result:", result);
     },
@@ -69,10 +70,8 @@ const Folder = () => {
    * @summary custom methods
    */
   const connect = useCallback(async () => {
-    connectApp({
-      appId: modelParser.appId,
-    });
-  }, [modelParser]);
+    connectApp();
+  }, [connectApp]);
 
   const handleCreateFolder = useCallback(async () => {
     createFolder({
@@ -80,7 +79,7 @@ const Folder = () => {
       folderName: 'example',
       folderDescription: 'example description'
     })
-  }, []);
+  }, [createFolder]);
 
   const handleChangeFolderBaseInfo = useCallback(async () => {
     if (!createdFolder) {
@@ -93,11 +92,11 @@ const Folder = () => {
       newFolderName: 'changed',
       newFolderDescription: 'changed description'
     })
-  }, [createdFolder]);
+  }, [createdFolder, changeFolderBaseInfo]);
 
   const handleReadAllFolders = useCallback(async () => {
     readAllFolders();
-  }, []);
+  }, [readAllFolders]);
 
   const handleChangeFolderType = useCallback(async () => {
     if (!createdFolder) {
@@ -109,7 +108,7 @@ const Folder = () => {
       folderId: folder.folderId,
       targetFolderType: FolderType.Public
     })
-  }, [createdFolder]);
+  }, [createdFolder, changeFolderType]);
 
   const handleDeleteFolder = useCallback(async () => {
     /* if (!createdFolder) {
@@ -120,7 +119,7 @@ const Folder = () => {
     deleteFolder({
       folderId: folder.folderId
     })
-  }, [createdFolder]);
+  }, [createdFolder, deleteFolder]);
 
   const handleMonetizeFolder = useCallback(async () => {
     if (!createdFolder) {
@@ -135,7 +134,7 @@ const Folder = () => {
       amount: 0.0001,
       collectLimit: 1000,
     })
-  }, [createdFolder]);
+  }, [createdFolder, monetizeFolder]);
 
   return (
     <>

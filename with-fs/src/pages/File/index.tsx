@@ -40,6 +40,7 @@ const File = () => {
   }, [folderMap]);
 
   const { connectApp } = useApp({
+    appId: modelParser.appId,
     onSuccess: (result) => {
       console.log("[connect]connect app success, result:", result);
     },
@@ -82,10 +83,8 @@ const File = () => {
    * @summary custom methods
    */
   const connect = useCallback(async () => {
-    connectApp({
-      appId: modelParser.appId,
-    });
-  }, [modelParser]);
+    connectApp();
+  }, [connectApp]);
 
   const handleUploadFile = useCallback(async () => {
     const name = StorageProviderName.Web3Storage;
