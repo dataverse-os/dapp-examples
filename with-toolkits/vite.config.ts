@@ -13,7 +13,7 @@ export default defineConfig({
     },
   },
   optimizeDeps: {
-    exclude: ["@tableland/sqlparser", "stream/web", "util/types"],
+    exclude: ["stream/web", "util/types"],
   },
   build: {
     outDir: './dist',

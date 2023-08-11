@@ -38,6 +38,7 @@ const App = () => {
 
   const { connectApp } = useApp({
     appId: modelParser.appId,
+    autoConnect: true,
     onSuccess: (result) => {
       console.log("[connect]connect app success, result:", result);
     },
@@ -217,6 +218,7 @@ const App = () => {
         images: [
           "https://bafkreidhjbco3nh4uc7wwt5c7auirotd76ch6hlzpps7bwdvgckflp7zmi.ipfs.w3s.link",
         ],
+        updatedAt: new Date().toISOString(),
       },
       encrypted: {
         text: true,

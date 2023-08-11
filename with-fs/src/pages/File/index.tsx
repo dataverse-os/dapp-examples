@@ -15,29 +15,35 @@ import {
   useUploadFile,
 } from "@dataverse/hooks";
 import { AppContext } from "../../main";
+import { useNavigate } from "react-router-dom";
 
 const File = () => {
   const { modelParser } = useContext(AppContext);
+  const navigate = useNavigate();
 
   /**
    * @summary import from @dataverse/hooks
    */
-  const { pkh, folderMap } = useStore();
+  const { pkh, foldersMap } = useStore();
 
   const currentFolderId = useMemo(() => {
-    const sortedFolerIds = Object.keys(folderMap)
-      .filter(
-        (el) =>
-          folderMap[el].options.folderName !=
-          modelParser.output.defaultFolderName
-      )
-      .sort(
-        (a, b) =>
-          Date.parse(folderMap[b].createdAt) -
-          Date.parse(folderMap[a].createdAt)
-      );
-    return sortedFolerIds[0];
-  }, [folderMap]);
+    if(foldersMap) {
+      const sortedFolerIds = Object.keys(foldersMap)
+        .filter(
+          (el) =>
+            foldersMap[el].options.folderName !=
+            modelParser.output.defaultFolderName
+        )
+        .sort(
+          (a, b) =>
+            Date.parse(foldersMap[b].createdAt) -
+            Date.parse(foldersMap[a].createdAt)
+        );
+      return sortedFolerIds[0];
+    } else {
+      return undefined;
+    }
+  }, [foldersMap]);
 
   const { connectApp } = useApp({
     appId: modelParser.appId,
@@ -100,7 +106,6 @@ const File = () => {
         name,
         apiKey,
       },
-      reRender: true,
     });
   }, []);
 
@@ -165,9 +170,9 @@ const File = () => {
     <>
       <button onClick={connect}>connect</button>
       <div className="black-text">{pkh}</div>
-      {folderMap && (
+      {foldersMap && (
         <div className="json-view">
-          <ReactJson src={folderMap} collapsed={true} />
+          <ReactJson src={foldersMap} collapsed={true} />
         </div>
       )}
       <hr />
@@ -201,6 +206,10 @@ const File = () => {
           <ReactJson src={monetizedFile} collapsed={true} />
         </div>
       )}
+      <br />
+      <hr />
+      <button onClick={() => navigate("/")}>Go To Home Page</button>
+      <button onClick={() => navigate("/folder")}>Go To Folder Page</button>
       <br />
     </>
   );

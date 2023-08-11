@@ -20,7 +20,7 @@ const App = () => {
   const navigate = useNavigate();
   const [postModel, setPostModel] = useState<Model>();
   const [currentStreamId, setCurrentStreamId] = useState<string>();
-  
+
   useEffect(() => {
     const postModel = modelParser.getModelByName("post");
     setPostModel(postModel);
@@ -29,24 +29,24 @@ const App = () => {
   /**
    * @summary import from @dataverse/hooks
    */
-  const {
-    address, pkh, streamsMap: posts
-  } = useStore();
+  const { address, pkh, streamsMap: posts } = useStore();
 
   const { connectApp } = useApp({
     appId: modelParser.appId,
+    autoConnect: true,
     onSuccess: (result) => {
       console.log("[connect]connect app success, result:", result);
     },
   });
 
-  const { createdStream: publicPost, createStream: createPublicStream } = useCreateStream({
-    streamType: StreamType.Public,
-    onSuccess: (result: any) => {
-      console.log("[createPublicPost]create public stream success:", result);
-      setCurrentStreamId(result.streamId);
-    },
-  });
+  const { createdStream: publicPost, createStream: createPublicStream } =
+    useCreateStream({
+      streamType: StreamType.Public,
+      onSuccess: (result: any) => {
+        console.log("[createPublicPost]create public stream success:", result);
+        setCurrentStreamId(result.streamId);
+      },
+    });
 
   const { createdStream: encryptedPost, createStream: createEncryptedStream } =
     useCreateStream({
@@ -60,13 +60,17 @@ const App = () => {
       },
     });
 
-  const { createdStream: payablePost, createStream: createPayableStream } = useCreateStream({
-    streamType: StreamType.Payable,
-    onSuccess: (result: any) => {
-      console.log("[createPayablePost]create payable stream success:", result);
-      setCurrentStreamId(result.streamId);
-    },
-  });
+  const { createdStream: payablePost, createStream: createPayableStream } =
+    useCreateStream({
+      streamType: StreamType.Payable,
+      onSuccess: (result: any) => {
+        console.log(
+          "[createPayablePost]create payable stream success:",
+          result
+        );
+        setCurrentStreamId(result.streamId);
+      },
+    });
 
   const { loadFeedsByAddress } = useFeedsByAddress({
     onError: (error) => {
@@ -83,17 +87,20 @@ const App = () => {
     },
   });
 
-  const { monetizedStreamContent: monetizedPost, monetizeStream } = useMonetizeStream({
-    onSuccess: (result) => {
-      console.log("[monetize]monetize stream success, result:", result);
-    },
-  });
+  const { monetizedStreamContent: monetizedPost, monetizeStream } =
+    useMonetizeStream({
+      onSuccess: (result) => {
+        console.log("[monetize]monetize stream success, result:", result);
+      },
+    });
 
-  const { unlockedStreamContent: unlockedPost, unlockStream } = useUnlockStream({
-    onSuccess: (result) => {
-      console.log("[unlockPost]unlock stream success, result:", result);
-    },
-  });
+  const { unlockedStreamContent: unlockedPost, unlockStream } = useUnlockStream(
+    {
+      onSuccess: (result) => {
+        console.log("[unlockPost]unlock stream success, result:", result);
+      },
+    }
+  );
 
   /**
    * @summary custom methods
@@ -214,6 +221,7 @@ const App = () => {
         images: [
           "https://bafkreidhjbco3nh4uc7wwt5c7auirotd76ch6hlzpps7bwdvgckflp7zmi.ipfs.w3s.link",
         ],
+        updatedAt: new Date().toISOString(),
       },
       encrypted: {
         text: true,
@@ -305,6 +313,6 @@ const App = () => {
       <br />
     </>
   );
-}
+};
 
 export default App;

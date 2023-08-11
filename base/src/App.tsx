@@ -37,6 +37,7 @@ const App = () => {
 
   const { connectApp } = useApp({
     appId: modelParser.appId,
+    autoConnect: true,
     onSuccess: (result) => {
       console.log("[connect]connect app success, result:", result);
     },

@@ -17,7 +17,6 @@ import XmtpClient, {
   ModelType as XmtpModelType,
 } from "@dataverse/xmtp-client-toolkit";
 
-import TablelandClient, { Network } from "@dataverse/tableland-client-toolkit";
 import LensClient, {
   CommentData,
   LensNetwork,
@@ -46,12 +45,9 @@ function Toolkits() {
   const pushChatClientRef = useRef<PushChatClient>();
   const pushNotificationClientRef = useRef<PushNotificationClient>();
   const livepeerClientRef = useRef<LivepeerClient>();
-  const tablelandClientRef = useRef<TablelandClient>();
   const xmtpClientRef = useRef<XmtpClient>();
   const lensClientRef = useRef<LensClient>();
   const snapshotClientRef = useRef<SnapshotClient>();
-  const [tableId, setTableId] = useState<string>();
-  const [tableName, setTableName] = useState<string>();
   const [asset, setAsset] = useState<any>(null);
   const [profileId, setProfileId] = useState<string>();
 
@@ -84,8 +80,6 @@ function Toolkits() {
     const pushNotificationModel = modelParser.getModelByName("pushnotification");
 
     const livepeerModel = modelParser.getModelByName("livepeerasset");
-
-    const tablelandModel = modelParser.getModelByName("table");
 
     const xmtpkeycacheModel = modelParser.getModelByName("xmtpkeycache");
 
@@ -125,16 +119,6 @@ function Toolkits() {
         env: ENV.STAGING,
       });
       pushNotificationClientRef.current = pushNotificationClient;
-    }
-
-    if (tablelandModel) {
-      const tablelandClient = new TablelandClient({
-        dataverseConnector,
-        walletProvider,
-        network: Network.MUMBAI,
-        modelId: tablelandModel?.streams[0].modelId,
-      });
-      tablelandClientRef.current = tablelandClient;
     }
 
     if (livepeerModel) {
@@ -185,6 +169,7 @@ function Toolkits() {
   }, []);
 
   const { connectApp } = useApp({
+    appId: modelParser.appId,
     onSuccess: (result) => {
       console.log("[connect]connect app success, result:", result);
     },
@@ -194,10 +179,8 @@ function Toolkits() {
    * @summary custom methods
    */
   const connect = useCallback(async () => {
-    connectApp({
-      appId: modelParser.appId,
-    });
-  }, [modelParser]);
+    connectApp();
+  }, [connectApp]);
 
   // Push Notifications
   const getUserSubscriptions = async () => {
@@ -361,59 +344,6 @@ function Toolkits() {
   const getChatMessageList = async () => {
     const msgList = await pushChatClientRef.current?.getMessageList();
     console.log("ChatMessageList: response: ", msgList);
-  };
-
-  // Tableland
-  const createTable = async () => {
-    await walletProvider.request({
-      method: "wallet_switchEthereumChain",
-      params: [{ chainId: "0x13881" }],
-    })
-
-    const CREATE_TABLE_SQL =
-      "CREATE TABLE test_table (id integer primary key, record text)";
-    console.log(tablelandClientRef.current);
-    const res = await tablelandClientRef.current?.createTable(CREATE_TABLE_SQL);
-    setTableId(res?.tableId);
-    setTableName(`${res?.tableName}_${res?.chainId}_${res?.tableId}`);
-    console.log("CreateTable: response: ", res);
-  };
-
-  const insertTable = async () => {
-    const MUTATE_TABLE_SQL = `INSERT INTO ${tableName} (id, record) values(1, 'hello man01')`;
-
-    const res = await tablelandClientRef.current?.mutateTable(
-      tableId!,
-      MUTATE_TABLE_SQL
-    );
-    console.log("InsertTable: response: ", res);
-  };
-
-  const updateTable = async () => {
-    const UPDATE_TABLE_SQL = `UPDATE ${tableName} SET record = 'hello man02' WHERE id = 1`;
-
-    const res = await tablelandClientRef.current?.mutateTable(
-      tableId!,
-      UPDATE_TABLE_SQL
-    );
-    console.log("UpdateTable: response: ", res);
-  };
-
-  const getTableByTableId = async () => {
-    const tablelandClient = tablelandClientRef.current;
-    const tableName = await tablelandClient?.getTableNameById(tableId!);
-    if (tableName) {
-      const result = await tablelandClient?.getTableByName(tableName);
-      console.log("GetTableByTableId:", result);
-    } else {
-      console.error("getTableNameById failed");
-    }
-  };
-
-  const getTableList = async () => {
-    const tablelandClient = tablelandClientRef.current;
-    const tables = await tablelandClient?.getTableList();
-    console.log("tables: ", tables);
   };
 
   // Xmtp
@@ -866,14 +796,6 @@ function Toolkits() {
       <button onClick={sendChatMessage}>sendChatMessage</button>
       <button onClick={fetchHistoryChats}>fetchHistoryChats</button>
       <button onClick={getChatMessageList}>getChatMessageList</button>
-      <br />
-
-      <h2 className="label">Tableland</h2>
-      <button onClick={createTable}>createTable</button>
-      <button onClick={insertTable}>insertTable</button>
-      <button onClick={updateTable}>updateTable</button>
-      <button onClick={getTableByTableId}>getTableByTableId</button>
-      <button onClick={getTableList}>getTableList</button>
       <br />
 
       <h2 className="label">Livepeer</h2>

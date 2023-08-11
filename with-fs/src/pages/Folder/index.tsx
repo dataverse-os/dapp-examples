@@ -12,15 +12,17 @@ import {
   useStore,
 } from "@dataverse/hooks";
 import { AppContext } from "../../main";
+import { useNavigate } from "react-router-dom";
 
 const Folder = () => {
   const { modelParser } = useContext(AppContext);
+  const navigate = useNavigate();
 
   /**
    * @summary import from @dataverse/hooks
    */
   const {
-    pkh, folderMap
+    pkh, foldersMap
   } = useStore();
 
   const { connectApp } = useApp({
@@ -140,9 +142,9 @@ const Folder = () => {
     <>
       <button onClick={connect}>connect</button>
       <div className="black-text">{pkh}</div>
-      {folderMap && (
+      {foldersMap && (
         <div className="json-view">
-          <ReactJson src={folderMap} collapsed={true} />
+          <ReactJson src={foldersMap} collapsed={true} />
         </div>
       )}
       <hr />
@@ -182,6 +184,10 @@ const Folder = () => {
           <ReactJson src={monetizedFolder} collapsed={true} />
         </div>
       )}
+      <br />
+      <hr />
+      <button onClick={() => navigate("/")}>Go To Home Page</button>
+      <button onClick={() => navigate("/file")}>Go To File Page</button>
       <br />
     </>
   );
