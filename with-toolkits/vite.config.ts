@@ -13,7 +13,7 @@ export default defineConfig({
     },
   },
   optimizeDeps: {
-    exclude: ["@tableland/sqlparser", "stream/web", "util/types"],
+    exclude: ["stream/web", "util/types"],
   },
   build: {
     outDir: './dist',
@@ -21,7 +21,7 @@ export default defineConfig({
     sourcemap: true,
   },
   server: {
-    port: 5173,
+    port: 7864,
     host: "0.0.0.0",
     fs: {
       allow: ["/"],

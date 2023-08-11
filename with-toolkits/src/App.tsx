@@ -1,65 +1,116 @@
-import "./App.css";
-import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import {
-  Currency,
-  StreamRecord
-} from "@dataverse/dataverse-connector";
-import { useWallet, useStream } from "@dataverse/hooks";
+import React, { useState, useEffect, useCallback } from "react";
 import ReactJson from "react-json-view";
-import { useConfig } from "./context/configContext";
+import { Currency } from "@dataverse/dataverse-connector";
+import {
+  StreamType,
+  useApp,
+  useCreateStream,
+  useFeedsByAddress,
+  useMonetizeStream,
+  useStore,
+  useUnlockStream,
+  useUpdateStream,
+} from "@dataverse/hooks";
 import { Model } from "@dataverse/model-parser";
+import { useNavigate } from "react-router-dom";
+import { useConfig } from "./context/configContext";
 
-function App() {
+const App = () => {
+  const { modelParser, appVersion } = useConfig();
   const navigate = useNavigate();
-  const { dataverseConnector, modelParser, appVersion } = useConfig();
   const [postModel, setPostModel] = useState<Model>();
   const [currentStreamId, setCurrentStreamId] = useState<string>();
-  const [publicPost, setPublicPost] = useState<StreamRecord>();
-  const [encryptedPost, setEncryptedPost] = useState<StreamRecord>();
-  const [payablePost, setPayablePost] = useState<StreamRecord>();
-  const [posts, setPosts] = useState<StreamRecord[]>(); // All posts
-  const [updatedPost, setUpdatedPost] = useState<StreamRecord>();
-  const [monetizedPost, setMonetizedPost] = useState<StreamRecord>();
-  const [unlockedPost, setUnlockedPost] = useState<StreamRecord>();
-
-  const { connectWallet } = useWallet(dataverseConnector);
-
-  const {
-    pkh,
-    createCapability,
-    loadStreams,
-    createPublicStream,
-    createEncryptedStream,
-    createPayableStream,
-    monetizeStream,
-    unlockStream,
-    updateStream,
-  } = useStream({
-    dataverseConnector,
-    appId: modelParser.appId,
-  });
 
   useEffect(() => {
     const postModel = modelParser.getModelByName("post");
     setPostModel(postModel);
-  }, [modelParser]);
+  }, []);
 
-  const connect = async () => {
-    const { wallet } = await connectWallet();
-    const pkh = await createCapability(wallet);
-    console.log("pkh:", pkh);
-    return pkh;
-  };
+  /**
+   * @summary import from @dataverse/hooks
+   */
+  const {
+    address, pkh, streamsMap: posts
+  } = useStore();
 
-  const createPublicPost = async () => {
+  const { connectApp } = useApp({
+    appId: modelParser.appId,
+    autoConnect: true,
+    onSuccess: (result) => {
+      console.log("[connect]connect app success, result:", result);
+    },
+  });
+
+  const { createdStream: publicPost, createStream: createPublicStream } = useCreateStream({
+    streamType: StreamType.Public,
+    onSuccess: (result: any) => {
+      console.log("[createPublicPost]create public stream success:", result);
+      setCurrentStreamId(result.streamId);
+    },
+  });
+
+  const { createdStream: encryptedPost, createStream: createEncryptedStream } =
+    useCreateStream({
+      streamType: StreamType.Encrypted,
+      onSuccess: (result: any) => {
+        console.log(
+          "[createEncryptedPost]create encrypted stream success:",
+          result
+        );
+        setCurrentStreamId(result.streamId);
+      },
+    });
+
+  const { createdStream: payablePost, createStream: createPayableStream } = useCreateStream({
+    streamType: StreamType.Payable,
+    onSuccess: (result: any) => {
+      console.log("[createPayablePost]create payable stream success:", result);
+      setCurrentStreamId(result.streamId);
+    },
+  });
+
+  const { loadFeedsByAddress } = useFeedsByAddress({
+    onError: (error) => {
+      console.error("[loadPosts]load streams failed,", error);
+    },
+    onSuccess: (result) => {
+      console.log("[loadPosts]load streams success, result:", result);
+    },
+  });
+
+  const { updatedStreamContent: updatedPost, updateStream } = useUpdateStream({
+    onSuccess: (result) => {
+      console.log("[updatePost]update stream success, result:", result);
+    },
+  });
+
+  const { monetizedStreamContent: monetizedPost, monetizeStream } = useMonetizeStream({
+    onSuccess: (result) => {
+      console.log("[monetize]monetize stream success, result:", result);
+    },
+  });
+
+  const { unlockedStreamContent: unlockedPost, unlockStream } = useUnlockStream({
+    onSuccess: (result) => {
+      console.log("[unlockPost]unlock stream success, result:", result);
+    },
+  });
+
+  /**
+   * @summary custom methods
+   */
+  const connect = useCallback(async () => {
+    connectApp();
+  }, [connectApp]);
+
+  const createPublicPost = useCallback(async () => {
     if (!postModel) {
       console.error("postModel undefined");
       return;
     }
-    const date = new Date().toISOString();
-    const { streamId, ...streamRecord } = await createPublicStream({
-      model: postModel,
+
+    createPublicStream({
+      modelId: postModel.streams[postModel.streams.length - 1].modelId,
       stream: {
         appVersion,
         text: "hello",
@@ -67,23 +118,21 @@ function App() {
           "https://bafkreib76wz6wewtkfmp5rhm3ep6tf4xjixvzzyh64nbyge5yhjno24yl4.ipfs.w3s.link",
         ],
         videos: [],
-        createdAt: date,
-        updatedAt: date,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
       },
     });
+  }, [postModel, createPublicStream]);
 
-    setCurrentStreamId(streamId);
-    setPublicPost(streamRecord as StreamRecord);
-  };
-
-  const createEncryptedPost = async () => {
+  const createEncryptedPost = useCallback(async () => {
     if (!postModel) {
       console.error("postModel undefined");
       return;
     }
 
     const date = new Date().toISOString();
-    const { streamId, ...streamRecord } = await createEncryptedStream({
+
+    createEncryptedStream({
       modelId: postModel.streams[postModel.streams.length - 1].modelId,
       stream: {
         appVersion,
@@ -101,24 +150,16 @@ function App() {
         videos: false,
       },
     });
+  }, [postModel, createEncryptedStream]);
 
-    setCurrentStreamId(streamId);
-    setEncryptedPost(streamRecord as StreamRecord);
-  };
-
-  const createPayablePost = async () => {
+  const createPayablePost = useCallback(async () => {
     if (!postModel) {
       console.error("postModel undefined");
       return;
     }
-    if (!pkh) {
-      console.error("need to create capability");
-      return;
-    }
 
     const date = new Date().toISOString();
-    const { streamId, ...streamRecord } = await createPayableStream({
-      pkh,
+    createPayableStream({
       modelId: postModel.streams[postModel.streams.length - 1].modelId,
       stream: {
         appVersion,
@@ -130,7 +171,6 @@ function App() {
         createdAt: date,
         updatedAt: date,
       },
-      lensNickName: "luketheskywalker1", //Only supports lower case characters, numbers, must be minimum of 5 length and maximum of 26 length
       currency: Currency.WMATIC,
       amount: 0.0001,
       collectLimit: 1000,
@@ -140,26 +180,25 @@ function App() {
         videos: false,
       },
     });
+  }, [postModel, address, pkh, createPayableStream]);
 
-    setCurrentStreamId(streamId);
-    setPayablePost(streamRecord as StreamRecord);
-  };
-
-  const loadPosts = async () => {
+  const loadPosts = useCallback(async () => {
     if (!postModel) {
       console.error("postModel undefined");
       return;
     }
+    if (!pkh) {
+      console.error("pkh undefined");
+      return;
+    }
 
-    const postRecord = await loadStreams({
+    await loadFeedsByAddress({
       pkh,
-      modelId: postModel.streams[0].modelId,
+      modelId: postModel.streams[postModel.streams.length - 1].modelId,
     });
-    console.log("loadPosts postRecord:", postRecord);
-    setPosts(Object.values(postRecord));
-  };
+  }, [postModel, pkh, loadFeedsByAddress]);
 
-  const updatePost = async () => {
+  const updatePost = useCallback(async () => {
     if (!postModel) {
       console.error("postModel undefined");
       return;
@@ -168,7 +207,7 @@ function App() {
       console.error("currentStreamId undefined");
       return;
     }
-    const { streamId, ...streamRecord } = await updateStream({
+    updateStream({
       model: postModel,
       streamId: currentStreamId,
       stream: {
@@ -176,6 +215,7 @@ function App() {
         images: [
           "https://bafkreidhjbco3nh4uc7wwt5c7auirotd76ch6hlzpps7bwdvgckflp7zmi.ipfs.w3s.link",
         ],
+        updatedAt: new Date().toISOString(),
       },
       encrypted: {
         text: true,
@@ -183,47 +223,36 @@ function App() {
         videos: false,
       },
     });
+  }, [postModel, currentStreamId, updateStream]);
 
-    setUpdatedPost(streamRecord as StreamRecord);
-  };
-
-  const monetizePost = async () => {
+  const monetizePost = useCallback(async () => {
     if (!postModel) {
       console.error("postModel undefined");
-      return;
-    }
-    if (!pkh) {
-      console.error("need to create capability");
       return;
     }
     if (!currentStreamId) {
       console.error("currentStreamId undefined");
       return;
     }
-    const { streamId, ...streamRecord } = await monetizeStream({
-      pkh,
-      modelId: postModel.streams[0].modelId,
+
+    monetizeStream({
       streamId: currentStreamId,
-      lensNickName: "jackieth", //Only supports lower case characters, numbers, must be minimum of 5 length and maximum of 26 length
       currency: Currency.WMATIC,
       amount: 0.0001,
       collectLimit: 1000,
     });
+  }, [postModel, currentStreamId, monetizeStream]);
 
-    setMonetizedPost(streamRecord as StreamRecord);
-  };
-
-  const unlockPost = async () => {
+  const unlockPost = useCallback(async () => {
     if (!currentStreamId) {
+      console.error("currentStreamId undefined");
       return;
     }
-    const { streamId, ...streamRecord } = await unlockStream(currentStreamId);
-
-    setUnlockedPost(streamRecord as StreamRecord);
-  };
+    unlockStream(currentStreamId);
+  }, [currentStreamId, unlockStream]);
 
   return (
-    <div className="App">
+    <>
       <button onClick={connect}>connect</button>
       <div className="black-text">{pkh}</div>
       <hr />
@@ -272,9 +301,10 @@ function App() {
           <ReactJson src={unlockedPost} collapsed={true} />
         </div>
       )}
-      <br />
+      <hr />
       <button onClick={() => navigate("/toolkits")}>Go To Toolkits Page</button>
-    </div>
+      <br />
+    </>
   );
 }
 

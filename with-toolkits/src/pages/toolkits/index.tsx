@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef } from "react";
-import { useWallet, useStream } from "@dataverse/hooks";
+import React, { useState, useEffect, useRef, useCallback } from "react";
+import { useApp, useStore } from "@dataverse/hooks";
 import { useConfig } from "../../context/configContext";
 import {
   PushNotificationClient,
@@ -17,7 +17,6 @@ import XmtpClient, {
   ModelType as XmtpModelType,
 } from "@dataverse/xmtp-client-toolkit";
 
-import TablelandClient, { Network } from "@dataverse/tableland-client-toolkit";
 import LensClient, {
   CommentData,
   LensNetwork,
@@ -35,23 +34,20 @@ import SnapshotClient, {
 import { LivepeerWidget, LivepeerPlayer } from "../../components/Livepeer";
 import { ethers } from "ethers";
 import ReactJson from "react-json-view";
-import { Currency } from "@dataverse/core-connector";
 import { Model } from "@dataverse/model-parser";
+import { Currency } from "@dataverse/dataverse-connector";
 
 const TEN_MINUTES = 10 * 60;
 
 function Toolkits() {
-  const { dataverseConnector, modelParser } = useConfig();
+  const { walletProvider, modelParser } = useConfig();
   const [postModel, setPostModel] = useState<Model>();
   const pushChatClientRef = useRef<PushChatClient>();
   const pushNotificationClientRef = useRef<PushNotificationClient>();
   const livepeerClientRef = useRef<LivepeerClient>();
-  const tablelandClientRef = useRef<TablelandClient>();
   const xmtpClientRef = useRef<XmtpClient>();
   const lensClientRef = useRef<LensClient>();
   const snapshotClientRef = useRef<SnapshotClient>();
-  const [tableId, setTableId] = useState<string>();
-  const [tableName, setTableName] = useState<string>();
   const [asset, setAsset] = useState<any>(null);
   const [profileId, setProfileId] = useState<string>();
 
@@ -64,11 +60,12 @@ function Toolkits() {
   const [profileIdPointed, setProfileIdPointed] = useState<string>();
   const [pubIdPointed, setPubIdPointed] = useState<string>();
 
-  const { address, connectWallet, switchNetwork } = useWallet(dataverseConnector);
-  const { pkh, createCapability } = useStream({
-    dataverseConnector,
-    appId: modelParser.appId
-  });
+  /**
+   * @summary import from @dataverse/hooks
+   */
+  const {
+    address, pkh, dataverseConnector
+  } = useStore();
 
   useEffect(() => {
     const postModel = modelParser.getModelByName("post");
@@ -83,8 +80,6 @@ function Toolkits() {
     const pushNotificationModel = modelParser.getModelByName("pushnotification");
 
     const livepeerModel = modelParser.getModelByName("livepeerasset");
-
-    const tablelandModel = modelParser.getModelByName("table");
 
     const xmtpkeycacheModel = modelParser.getModelByName("xmtpkeycache");
 
@@ -126,15 +121,6 @@ function Toolkits() {
       pushNotificationClientRef.current = pushNotificationClient;
     }
 
-    if (tablelandModel) {
-      const tablelandClient = new TablelandClient({
-        dataverseConnector,
-        network: Network.MUMBAI,
-        modelId: tablelandModel?.streams[0].modelId,
-      });
-      tablelandClientRef.current = tablelandClient;
-    }
-
     if (livepeerModel) {
       const livepeerClient = new LivepeerClient({
         apiKey: (import.meta as any).env.VITE_LIVEPEER_API_KEY,
@@ -163,6 +149,7 @@ function Toolkits() {
           [LensModelType.Collection]: lenscollectionModel.streams[0].modelId,
         },
         dataverseConnector,
+        walletProvider,
         network: LensNetwork.SandboxMumbaiTestnet,
       });
       lensClientRef.current = lensClient;
@@ -181,12 +168,19 @@ function Toolkits() {
     }
   }, []);
 
-  const connect = async () => {
-    const { wallet } = await connectWallet();
-    const pkh = await createCapability(wallet);
-    console.log("pkh:", pkh);
-    return pkh;
-  };
+  const { connectApp } = useApp({
+    appId: modelParser.appId,
+    onSuccess: (result) => {
+      console.log("[connect]connect app success, result:", result);
+    },
+  });
+
+  /**
+   * @summary custom methods
+   */
+  const connect = useCallback(async () => {
+    connectApp();
+  }, [connectApp]);
 
   // Push Notifications
   const getUserSubscriptions = async () => {
@@ -352,58 +346,11 @@ function Toolkits() {
     console.log("ChatMessageList: response: ", msgList);
   };
 
-  // Tableland
-  const createTable = async () => {
-    await switchNetwork(80001);
-
-    const CREATE_TABLE_SQL =
-      "CREATE TABLE test_table (id integer primary key, record text)";
-    console.log(tablelandClientRef.current);
-    const res = await tablelandClientRef.current?.createTable(CREATE_TABLE_SQL);
-    setTableId(res?.tableId);
-    setTableName(`${res?.tableName}_${res?.chainId}_${res?.tableId}`);
-    console.log("CreateTable: response: ", res);
-  };
-
-  const insertTable = async () => {
-    const MUTATE_TABLE_SQL = `INSERT INTO ${tableName} (id, record) values(1, 'hello man01')`;
-
-    const res = await tablelandClientRef.current?.mutateTable(
-      tableId!,
-      MUTATE_TABLE_SQL
-    );
-    console.log("InsertTable: response: ", res);
-  };
-
-  const updateTable = async () => {
-    const UPDATE_TABLE_SQL = `UPDATE ${tableName} SET record = 'hello man02' WHERE id = 1`;
-
-    const res = await tablelandClientRef.current?.mutateTable(
-      tableId!,
-      UPDATE_TABLE_SQL
-    );
-    console.log("UpdateTable: response: ", res);
-  };
-
-  const getTableByTableId = async () => {
-    const tablelandClient = tablelandClientRef.current;
-    const tableName = await tablelandClient?.getTableNameById(tableId!);
-    if (tableName) {
-      const result = await tablelandClient?.getTableByName(tableName);
-      console.log("GetTableByTableId:", result);
-    } else {
-      console.error("getTableNameById failed");
-    }
-  };
-
-  const getTableList = async () => {
-    const tablelandClient = tablelandClientRef.current;
-    const tables = await tablelandClient?.getTableList();
-    console.log("tables: ", tables);
-  };
-
   // Xmtp
   const isUserOnNetwork = async () => {
+    if (!address) {
+      throw new Error("address undefined");
+    }
     const isOnNetwork = await xmtpClientRef.current?.isUserOnNetwork(
       address,
       "production"
@@ -717,7 +664,7 @@ function Toolkits() {
 
   /** snapshot toolkit */
   const createProposal = async () => {
-    if(!spaceId) {
+    if (!spaceId) {
       alert("please enter spaceId ...");
       return;
     }
@@ -741,7 +688,7 @@ function Toolkits() {
   }
 
   const vote = async () => {
-    if(!proposalId || !spaceId) {
+    if (!proposalId || !spaceId) {
       alert("create a proposal before vote");
       return;
     }
@@ -761,7 +708,7 @@ function Toolkits() {
   }
 
   const joinSpace = async () => {
-    if(!spaceId) {
+    if (!spaceId) {
       alert("please enter spaceId ...");
       return;
     }
@@ -773,7 +720,7 @@ function Toolkits() {
     console.log("[joinSpace]res:", res);
   }
   const getActions = async () => {
-    if(!spaceId) {
+    if (!spaceId) {
       alert("please enter spaceId ...");
       return;
     }
@@ -784,7 +731,7 @@ function Toolkits() {
       skip: 10,
       orderDirection: OrderDirection.asc
     } as GetActionParams
-    const res =  await snapshotClientRef.current!.getActions(params);
+    const res = await snapshotClientRef.current!.getActions(params);
     console.log("[getActions]", res)
   }
 
@@ -849,14 +796,6 @@ function Toolkits() {
       <button onClick={sendChatMessage}>sendChatMessage</button>
       <button onClick={fetchHistoryChats}>fetchHistoryChats</button>
       <button onClick={getChatMessageList}>getChatMessageList</button>
-      <br />
-
-      <h2 className="label">Tableland</h2>
-      <button onClick={createTable}>createTable</button>
-      <button onClick={insertTable}>insertTable</button>
-      <button onClick={updateTable}>updateTable</button>
-      <button onClick={getTableByTableId}>getTableByTableId</button>
-      <button onClick={getTableList}>getTableList</button>
       <br />
 
       <h2 className="label">Livepeer</h2>

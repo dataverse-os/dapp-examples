@@ -1,5 +1,5 @@
 export const config = {
-  name: "dataverse_app_base_example", // app name should NOT contain "-"
+  name: "dataverse_app_with_fs_example", // app name should NOT contain "-"
   logo: "https://bafybeifozdhcbbfydy2rs6vbkbbtj3wc4vjlz5zg2cnqhb2g4rm2o5ldna.ipfs.w3s.link/dataverse.svg",
   website: [], // you can use localhost:(port) for testing
   defaultFolderName: "Main",

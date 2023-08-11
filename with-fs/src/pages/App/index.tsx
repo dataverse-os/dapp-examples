@@ -1,6 +1,4 @@
-import "@rainbow-me/rainbowkit/styles.css";
-import { ConnectButton } from "@rainbow-me/rainbowkit";
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useContext } from "react";
 import ReactJson from "react-json-view";
 import { Currency } from "@dataverse/dataverse-connector";
 import {
@@ -13,14 +11,13 @@ import {
   useUnlockStream,
   useUpdateStream,
 } from "@dataverse/hooks";
-import { Model, ModelParser, Output } from "@dataverse/model-parser";
-import app from "../output/app.json";
-import pacakage from "../package.json";
-
-const appVersion = pacakage.version;
-const modelParser = new ModelParser(app as Output);
+import { AppContext } from "../../main";
+import { Model } from "@dataverse/model-parser";
+import { useNavigate } from "react-router-dom";
 
 const App = () => {
+  const { modelParser, appVersion } = useContext(AppContext);
+  const navigate = useNavigate();
   const [postModel, setPostModel] = useState<Model>();
   const [currentStreamId, setCurrentStreamId] = useState<string>();
 
@@ -32,9 +29,7 @@ const App = () => {
   /**
    * @summary import from @dataverse/hooks
    */
-  const {
-    address, pkh, streamsMap: posts
-  } = useStore();
+  const { address, pkh, streamsMap: posts } = useStore();
 
   const { connectApp } = useApp({
     appId: modelParser.appId,
@@ -44,13 +39,14 @@ const App = () => {
     },
   });
 
-  const { createdStream: publicPost, createStream: createPublicStream } = useCreateStream({
-    streamType: StreamType.Public,
-    onSuccess: (result: any) => {
-      console.log("[createPublicPost]create public stream success:", result);
-      setCurrentStreamId(result.streamId);
-    },
-  });
+  const { createdStream: publicPost, createStream: createPublicStream } =
+    useCreateStream({
+      streamType: StreamType.Public,
+      onSuccess: (result: any) => {
+        console.log("[createPublicPost]create public stream success:", result);
+        setCurrentStreamId(result.streamId);
+      },
+    });
 
   const { createdStream: encryptedPost, createStream: createEncryptedStream } =
     useCreateStream({
@@ -64,13 +60,17 @@ const App = () => {
       },
     });
 
-  const { createdStream: payablePost, createStream: createPayableStream } = useCreateStream({
-    streamType: StreamType.Payable,
-    onSuccess: (result: any) => {
-      console.log("[createPayablePost]create payable stream success:", result);
-      setCurrentStreamId(result.streamId);
-    },
-  });
+  const { createdStream: payablePost, createStream: createPayableStream } =
+    useCreateStream({
+      streamType: StreamType.Payable,
+      onSuccess: (result: any) => {
+        console.log(
+          "[createPayablePost]create payable stream success:",
+          result
+        );
+        setCurrentStreamId(result.streamId);
+      },
+    });
 
   const { loadFeedsByAddress } = useFeedsByAddress({
     onError: (error) => {
@@ -87,17 +87,20 @@ const App = () => {
     },
   });
 
-  const { monetizedStreamContent: monetizedPost, monetizeStream } = useMonetizeStream({
-    onSuccess: (result) => {
-      console.log("[monetize]monetize stream success, result:", result);
-    },
-  });
+  const { monetizedStreamContent: monetizedPost, monetizeStream } =
+    useMonetizeStream({
+      onSuccess: (result) => {
+        console.log("[monetize]monetize stream success, result:", result);
+      },
+    });
 
-  const { unlockedStreamContent: unlockedPost, unlockStream } = useUnlockStream({
-    onSuccess: (result) => {
-      console.log("[unlockPost]unlock stream success, result:", result);
-    },
-  });
+  const { unlockedStreamContent: unlockedPost, unlockStream } = useUnlockStream(
+    {
+      onSuccess: (result) => {
+        console.log("[unlockPost]unlock stream success, result:", result);
+      },
+    }
+  );
 
   /**
    * @summary custom methods
@@ -256,9 +259,6 @@ const App = () => {
 
   return (
     <>
-      <div className="connect-button">
-        <ConnectButton />
-      </div>
       <button onClick={connect}>connect</button>
       <div className="black-text">{pkh}</div>
       <hr />
@@ -307,11 +307,12 @@ const App = () => {
           <ReactJson src={unlockedPost} collapsed={true} />
         </div>
       )}
+      <hr />
+      <button onClick={() => navigate("/folder")}>Go To Folder Page</button>
+      <button onClick={() => navigate("/file")}>Go To File Page</button>
       <br />
     </>
   );
-}
+};
 
 export default App;
-
-

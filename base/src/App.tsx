@@ -31,9 +31,14 @@ const App = () => {
   /**
    * @summary import from @dataverse/hooks
    */
-  const { address, pkh, streamsMap: posts } = useStore();
+
+  const {
+    address, pkh, streamsMap: posts
+  } = useStore();
 
   const { connectApp } = useApp({
+    appId: modelParser.appId,
+    autoConnect: true,
     onSuccess: (result) => {
       console.log("[connect]connect app success, result:", result);
     },
@@ -98,10 +103,8 @@ const App = () => {
    * @summary custom methods
    */
   const connect = useCallback(async () => {
-    connectApp({
-      appId: modelParser.appId,
-    });
-  }, [modelParser]);
+    connectApp();
+  }, [connectApp]);
 
   const createPublicPost = useCallback(async () => {
     if (!postModel) {
@@ -122,7 +125,7 @@ const App = () => {
         updatedAt: new Date().toISOString(),
       },
     });
-  }, [postModel]);
+  }, [postModel, createPublicStream]);
 
   const createEncryptedPost = useCallback(async () => {
     if (!postModel) {
@@ -150,7 +153,7 @@ const App = () => {
         videos: false,
       },
     });
-  }, [postModel]);
+  }, [postModel, createEncryptedStream]);
 
   const createPayablePost = useCallback(async () => {
     if (!postModel) {
@@ -180,7 +183,7 @@ const App = () => {
         videos: false,
       },
     });
-  }, [postModel, address, pkh]);
+  }, [postModel, address, pkh, createPayableStream]);
 
   const loadPosts = useCallback(async () => {
     if (!postModel) {
@@ -196,7 +199,7 @@ const App = () => {
       pkh,
       modelId: postModel.streams[postModel.streams.length - 1].modelId,
     });
-  }, [postModel, pkh]);
+  }, [postModel, pkh, loadFeedsByAddress]);
 
   const updatePost = useCallback(async () => {
     if (!postModel) {
@@ -222,7 +225,7 @@ const App = () => {
         videos: false,
       },
     });
-  }, [postModel, currentStreamId]);
+  }, [postModel, currentStreamId, updateStream]);
 
   const monetizePost = useCallback(async () => {
     if (!postModel) {
@@ -240,7 +243,7 @@ const App = () => {
       amount: 0.0001,
       collectLimit: 1000,
     });
-  }, [postModel, currentStreamId]);
+  }, [postModel, currentStreamId, monetizeStream]);
 
   const unlockPost = useCallback(async () => {
     if (!currentStreamId) {
@@ -248,7 +251,7 @@ const App = () => {
       return;
     }
     unlockStream(currentStreamId);
-  }, [currentStreamId]);
+  }, [currentStreamId, unlockStream]);
 
   return (
     <>

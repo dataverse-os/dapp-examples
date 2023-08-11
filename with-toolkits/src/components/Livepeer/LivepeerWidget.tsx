@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import LivepeerClient from "@dataverse/livepeer-client-toolkit";
-import { Currency } from "@dataverse/core-connector";
+import { Currency } from "@dataverse/dataverse-connector";
 
 interface IProps {
   address?: string;
