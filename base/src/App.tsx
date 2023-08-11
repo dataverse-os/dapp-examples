@@ -31,6 +31,7 @@ const App = () => {
   /**
    * @summary import from @dataverse/hooks
    */
+
   const {
     address, pkh, streamsMap: posts
   } = useStore();
