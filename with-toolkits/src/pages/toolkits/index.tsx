@@ -1,6 +1,11 @@
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import React, {
+  useState,
+  useEffect,
+  useRef,
+  useCallback,
+  useContext,
+} from "react";
 import { useApp, useStore } from "@dataverse/hooks";
-import { useConfig } from "../../context/configContext";
 import {
   PushNotificationClient,
   PushChatClient,
@@ -28,19 +33,26 @@ import LensClient, {
 import SnapshotClient, {
   ModelType as snapshotModelType,
   SNAP_SHOT_HUB,
-  OrderDirection, GetActionParams, State, GetProposalsParams, now, Proposal, Vote
-} from "@dataverse/snapshot-client-toolkit"
+  OrderDirection,
+  GetActionParams,
+  State,
+  GetProposalsParams,
+  now,
+  Proposal,
+  Vote,
+} from "@dataverse/snapshot-client-toolkit";
 
-import { LivepeerWidget, LivepeerPlayer } from "../../components/Livepeer";
+import { LivepeerWidget, LivepeerPlayer } from "../../components";
 import { ethers } from "ethers";
 import ReactJson from "react-json-view";
 import { Model } from "@dataverse/model-parser";
 import { Currency } from "@dataverse/dataverse-connector";
+import { AppContext } from "../../main";
 
 const TEN_MINUTES = 10 * 60;
 
-function Toolkits() {
-  const { walletProvider, modelParser } = useConfig();
+export const Toolkits = () => {
+  const { walletProvider, modelParser } = useContext(AppContext);
   const [postModel, setPostModel] = useState<Model>();
   const pushChatClientRef = useRef<PushChatClient>();
   const pushNotificationClientRef = useRef<PushNotificationClient>();
@@ -63,9 +75,7 @@ function Toolkits() {
   /**
    * @summary import from @dataverse/hooks
    */
-  const {
-    address, pkh, dataverseConnector
-  } = useStore();
+  const { address, pkh, dataverseConnector } = useStore();
 
   useEffect(() => {
     const postModel = modelParser.getModelByName("post");
@@ -77,7 +87,8 @@ function Toolkits() {
 
     const pushChatGPGKeyModel = modelParser.getModelByName("pushchatgpgkey");
 
-    const pushNotificationModel = modelParser.getModelByName("pushnotification");
+    const pushNotificationModel =
+      modelParser.getModelByName("pushnotification");
 
     const livepeerModel = modelParser.getModelByName("livepeerasset");
 
@@ -89,7 +100,8 @@ function Toolkits() {
 
     const lenscollectionModel = modelParser.getModelByName("lenscollection");
 
-    const snapshotproposalModel = modelParser.getModelByName("snapshotproposal");
+    const snapshotproposalModel =
+      modelParser.getModelByName("snapshotproposal");
 
     const snapshotvoteModel = modelParser.getModelByName("snapshotvote");
 
@@ -98,9 +110,11 @@ function Toolkits() {
         dataverseConnector,
         modelIds: {
           [PushModelType.MESSAGE]: pushChatMessageModel?.streams[0].modelId!,
-          [PushModelType.USER_PGP_KEY]: pushChatGPGKeyModel?.streams[0].modelId!,
+          [PushModelType.USER_PGP_KEY]:
+            pushChatGPGKeyModel?.streams[0].modelId!,
           [PushModelType.CHANNEL]: pushChannelModel?.streams[0].modelId!,
-          [PushModelType.NOTIFICATION]: pushNotificationModel?.streams[0].modelId!,
+          [PushModelType.NOTIFICATION]:
+            pushNotificationModel?.streams[0].modelId!,
         },
         env: ENV.STAGING,
       });
@@ -112,9 +126,11 @@ function Toolkits() {
         dataverseConnector,
         modelIds: {
           [PushModelType.MESSAGE]: pushChatMessageModel?.streams[0].modelId!,
-          [PushModelType.USER_PGP_KEY]: pushChatGPGKeyModel?.streams[0].modelId!,
+          [PushModelType.USER_PGP_KEY]:
+            pushChatGPGKeyModel?.streams[0].modelId!,
           [PushModelType.CHANNEL]: pushChannelModel?.streams[0].modelId!,
-          [PushModelType.NOTIFICATION]: pushNotificationModel?.streams[0].modelId!,
+          [PushModelType.NOTIFICATION]:
+            pushNotificationModel?.streams[0].modelId!,
         },
         env: ENV.STAGING,
       });
@@ -159,7 +175,8 @@ function Toolkits() {
       const snapshotClient = new SnapshotClient({
         dataverseConnector,
         modelIds: {
-          [snapshotModelType.PROPOSAL]: snapshotproposalModel?.streams[0].modelId!,
+          [snapshotModelType.PROPOSAL]:
+            snapshotproposalModel?.streams[0].modelId!,
           [snapshotModelType.VOTE]: snapshotvoteModel?.streams[0].modelId!,
         },
         env: SNAP_SHOT_HUB.dev,
@@ -407,7 +424,7 @@ function Toolkits() {
     if (!address) {
       return;
     }
-    console.log("lensClientRef.current:", lensClientRef.current)
+    console.log("lensClientRef.current:", lensClientRef.current);
     const res = await lensClientRef.current?.getProfiles(address);
     console.log("[getprofiles]res:", res);
     if (res!.length > 0) {
@@ -421,7 +438,8 @@ function Toolkits() {
     }
     const date = new Date().toISOString();
 
-    const collectModule = lensClientRef.current?.lensContractsAddress.FreeCollectModule;
+    const collectModule =
+      lensClientRef.current?.lensContractsAddress.FreeCollectModule;
     const collectModuleInitData = ethers.utils.defaultAbiCoder.encode(
       ["bool"],
       [false]
@@ -472,7 +490,8 @@ function Toolkits() {
     }
     const date = new Date().toISOString();
 
-    const collectModule = lensClientRef.current?.lensContractsAddress.FreeCollectModule;
+    const collectModule =
+      lensClientRef.current?.lensContractsAddress.FreeCollectModule;
     const collectModuleInitData = ethers.utils.defaultAbiCoder.encode(
       ["bool"],
       [false]
@@ -655,7 +674,7 @@ function Toolkits() {
   const getPersistedPublications = async () => {
     const res = await lensClientRef.current?.getPersistedPublications();
     console.log("[getPersistedPublications]res:", res);
-  }
+  };
 
   const getPersistedCollections = async () => {
     const res = await lensClientRef.current?.getPersistedCollections();
@@ -685,27 +704,25 @@ function Toolkits() {
 
     console.log("[createProposal]res:", res);
     setProposalId((res as any).id);
-  }
+  };
 
   const vote = async () => {
     if (!proposalId || !spaceId) {
       alert("create a proposal before vote");
       return;
     }
-    const test_vote =
-      {
-        space: spaceId,
-        proposal: proposalId,
-        type: 'single-choice',
-        choice: 1,
-        reason: 'Choice 1 make lot of sense',
-        app: 'my-app'
-      } as Vote;
-
+    const test_vote = {
+      space: spaceId,
+      proposal: proposalId,
+      type: "single-choice",
+      choice: 1,
+      reason: "Choice 1 make lot of sense",
+      app: "my-app",
+    } as Vote;
 
     const res = await snapshotClientRef.current!.castVote(test_vote);
     console.log("[vote]res:", res);
-  }
+  };
 
   const joinSpace = async () => {
     if (!spaceId) {
@@ -714,11 +731,11 @@ function Toolkits() {
     }
 
     const spaceObj = {
-      space: spaceId as string
-    }
+      space: spaceId as string,
+    };
     const res = await snapshotClientRef.current!.joinSpace(spaceObj);
     console.log("[joinSpace]res:", res);
-  }
+  };
   const getActions = async () => {
     if (!spaceId) {
       alert("please enter spaceId ...");
@@ -729,11 +746,11 @@ function Toolkits() {
       space: spaceId,
       first: 20,
       skip: 10,
-      orderDirection: OrderDirection.asc
-    } as GetActionParams
+      orderDirection: OrderDirection.asc,
+    } as GetActionParams;
     const res = await snapshotClientRef.current!.getActions(params);
-    console.log("[getActions]", res)
-  }
+    console.log("[getActions]", res);
+  };
 
   const getProposals = async () => {
     const variables = {
@@ -741,34 +758,37 @@ function Toolkits() {
       first: 20,
       skip: 0,
       state: State.active,
-      orderDirection: OrderDirection.asc
+      orderDirection: OrderDirection.asc,
     } as GetProposalsParams;
     const res = await snapshotClientRef.current!.getProposals(variables);
     console.log("[queryProposals]", res);
-    setProposals(res)
-  }
+    setProposals(res);
+  };
 
   const queryProposal = async () => {
     const res = await snapshotClientRef.current!.getProposalById(
-      proposalId ?? "0x5d790744b950c5d60e025b3076e1a37022f6a5a2ffcf56ba38e2d85192997ede"
+      proposalId ??
+        "0x5d790744b950c5d60e025b3076e1a37022f6a5a2ffcf56ba38e2d85192997ede"
     );
     console.log("[queryProposal]", res);
-  }
+  };
 
   const querySpaceDetail = async () => {
-    const res = await snapshotClientRef.current!.getSpaceDetail(sId ?? spaceId ?? "toolkits.eth");
-    console.log("[querySpaceDetail]", res)
-  }
+    const res = await snapshotClientRef.current!.getSpaceDetail(
+      sId ?? spaceId ?? "toolkits.eth"
+    );
+    console.log("[querySpaceDetail]", res);
+  };
 
   const listVotes = async () => {
     const res = await snapshotClientRef.current!.listVotes();
-    console.log("[listVotes]", res)
-  }
+    console.log("[listVotes]", res);
+  };
 
   const listProposals = async () => {
     const res = await snapshotClientRef.current!.listProposals();
-    console.log("[listProposals]", res)
-  }
+    console.log("[listProposals]", res);
+  };
 
   return (
     <div className="App">
@@ -776,7 +796,7 @@ function Toolkits() {
       <div className="black-text">{pkh}</div>
       <hr />
 
-      <h2 className="label">Push Channel</h2>
+      <h2 className="label">Push Channel(Goerli Testnet)</h2>
       <button onClick={getUserSubscriptions}>getUserSubscriptions</button>
       <button onClick={getUserSpamNotifications}>
         getUserSpamNotifications
@@ -791,7 +811,7 @@ function Toolkits() {
       <button onClick={getNotificationList}>getNotificationList</button>
       <br />
 
-      <h2 className="label">Push Chat</h2>
+      <h2 className="label">Push Chat(Goerli Testnet)</h2>
       <button onClick={createPushChatUser}>createPushChatUser</button>
       <button onClick={sendChatMessage}>sendChatMessage</button>
       <button onClick={fetchHistoryChats}>fetchHistoryChats</button>
@@ -846,7 +866,9 @@ function Toolkits() {
       <button onClick={mirrorWithSig}>mirrorWithSig</button>
       <button onClick={collectOnCeramic}>collectOnCeramic</button>
       <button onClick={collectOnCeramicWithSig}>collectOnCeramicWithSig</button>
-      <button onClick={getPersistedPublications}>getPersistedPublications</button>
+      <button onClick={getPersistedPublications}>
+        getPersistedPublications
+      </button>
       <button onClick={getPersistedCollections}>getPersistedCollections</button>
       <br />
 
@@ -885,6 +907,4 @@ function Toolkits() {
       <button onClick={listProposals}>listProposals</button>
     </div>
   );
-}
-
-export default Toolkits;
+};
