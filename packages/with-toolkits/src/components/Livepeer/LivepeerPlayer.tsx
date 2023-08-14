@@ -9,11 +9,11 @@ interface IProps {
 export const LivepeerPlayer = ({ reactClient, playbackId }: IProps) => {
   return (
     <Player
-      title="Waterfalls"
+      title='Waterfalls'
       playbackId={playbackId}
       showPipButton
       showTitle={false}
-      aspectRatio="16to9"
+      aspectRatio='16to9'
       controls={{
         autohide: 3000,
       }}

@@ -32,25 +32,24 @@ const App = () => {
    * @summary import from @dataverse/hooks
    */
 
-  const {
-    address, pkh, streamsMap: posts
-  } = useStore();
+  const { address, pkh, streamsMap: posts } = useStore();
 
   const { connectApp } = useApp({
     appId: modelParser.appId,
     autoConnect: true,
-    onSuccess: (result) => {
+    onSuccess: result => {
       console.log("[connect]connect app success, result:", result);
     },
   });
 
-  const { createdStream: publicPost, createStream: createPublicStream } = useCreateStream({
-    streamType: StreamType.Public,
-    onSuccess: (result: any) => {
-      console.log("[createPublicPost]create public stream success:", result);
-      setCurrentStreamId(result.streamId);
-    },
-  });
+  const { createdStream: publicPost, createStream: createPublicStream } =
+    useCreateStream({
+      streamType: StreamType.Public,
+      onSuccess: (result: any) => {
+        console.log("[createPublicPost]create public stream success:", result);
+        setCurrentStreamId(result.streamId);
+      },
+    });
 
   const { createdStream: encryptedPost, createStream: createEncryptedStream } =
     useCreateStream({
@@ -58,46 +57,53 @@ const App = () => {
       onSuccess: (result: any) => {
         console.log(
           "[createEncryptedPost]create encrypted stream success:",
-          result
+          result,
         );
         setCurrentStreamId(result.streamId);
       },
     });
 
-  const { createdStream: payablePost, createStream: createPayableStream } = useCreateStream({
-    streamType: StreamType.Payable,
-    onSuccess: (result: any) => {
-      console.log("[createPayablePost]create payable stream success:", result);
-      setCurrentStreamId(result.streamId);
-    },
-  });
+  const { createdStream: payablePost, createStream: createPayableStream } =
+    useCreateStream({
+      streamType: StreamType.Payable,
+      onSuccess: (result: any) => {
+        console.log(
+          "[createPayablePost]create payable stream success:",
+          result,
+        );
+        setCurrentStreamId(result.streamId);
+      },
+    });
 
   const { loadFeedsByAddress } = useFeedsByAddress({
-    onError: (error) => {
+    onError: error => {
       console.error("[loadPosts]load streams failed,", error);
     },
-    onSuccess: (result) => {
+    onSuccess: result => {
       console.log("[loadPosts]load streams success, result:", result);
     },
   });
 
   const { updatedStreamContent: updatedPost, updateStream } = useUpdateStream({
-    onSuccess: (result) => {
+    onSuccess: result => {
       console.log("[updatePost]update stream success, result:", result);
     },
   });
 
-  const { monetizedStreamContent: monetizedPost, monetizeStream } = useMonetizeStream({
-    onSuccess: (result) => {
-      console.log("[monetize]monetize stream success, result:", result);
-    },
-  });
+  const { monetizedStreamContent: monetizedPost, monetizeStream } =
+    useMonetizeStream({
+      onSuccess: result => {
+        console.log("[monetize]monetize stream success, result:", result);
+      },
+    });
 
-  const { unlockedStreamContent: unlockedPost, unlockStream } = useUnlockStream({
-    onSuccess: (result) => {
-      console.log("[unlockPost]unlock stream success, result:", result);
+  const { unlockedStreamContent: unlockedPost, unlockStream } = useUnlockStream(
+    {
+      onSuccess: result => {
+        console.log("[unlockPost]unlock stream success, result:", result);
+      },
     },
-  });
+  );
 
   /**
    * @summary custom methods
@@ -256,56 +262,56 @@ const App = () => {
   return (
     <>
       <button onClick={connect}>connect</button>
-      <div className="black-text">{pkh}</div>
+      <div className='black-text'>{pkh}</div>
       <hr />
       <button onClick={createPublicPost}>createPublicPost</button>
       {publicPost && (
-        <div className="json-view">
+        <div className='json-view'>
           <ReactJson src={publicPost} collapsed={true} />
         </div>
       )}
       <button onClick={createEncryptedPost}>createEncryptedPost</button>
       {encryptedPost && (
-        <div className="json-view">
+        <div className='json-view'>
           <ReactJson src={encryptedPost} collapsed={true} />
         </div>
       )}
       <button onClick={createPayablePost}>createPayablePost</button>
       {payablePost && (
-        <div className="json-view">
+        <div className='json-view'>
           <ReactJson src={payablePost} collapsed={true} />
         </div>
       )}
-      <div className="red">
+      <div className='red'>
         You need a testnet lens profile to monetize data.
       </div>
       <button onClick={loadPosts}>loadPosts</button>
       {posts && (
-        <div className="json-view">
+        <div className='json-view'>
           <ReactJson src={posts} collapsed={true} />
         </div>
       )}
       <button onClick={updatePost}>updatePost</button>
       {updatedPost && (
-        <div className="json-view">
+        <div className='json-view'>
           <ReactJson src={updatedPost} collapsed={true} />
         </div>
       )}
       <button onClick={monetizePost}>monetizePost</button>
       {monetizedPost && (
-        <div className="json-view">
+        <div className='json-view'>
           <ReactJson src={monetizedPost} collapsed={true} />
         </div>
       )}
       <button onClick={unlockPost}>unlockPost</button>
       {unlockedPost && (
-        <div className="json-view">
+        <div className='json-view'>
           <ReactJson src={unlockedPost} collapsed={true} />
         </div>
       )}
       <br />
     </>
   );
-}
+};
 
 export default App;

@@ -7,5 +7,5 @@ import { DataverseContextProvider } from "@dataverse/hooks";
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <DataverseContextProvider>
     <App />
-  </DataverseContextProvider>
+  </DataverseContextProvider>,
 );

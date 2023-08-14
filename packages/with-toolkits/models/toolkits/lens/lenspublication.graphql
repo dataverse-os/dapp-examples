@@ -1,4 +1,5 @@
-type lenspublication @createModel(accountRelation: LIST, description: "lenspublication") {
+type lenspublication
+  @createModel(accountRelation: LIST, description: "lenspublication") {
   owner: DID! @documentAccount
   publication_type: String! @string(maxLength: 100)
   profile_id: String! @string(maxLength: 100)

@@ -66,7 +66,7 @@ export const LivepeerWidget = ({
 
   return (
     <div>
-      <input type="file" onChange={handleFileChange} className="upload" />
+      <input type='file' onChange={handleFileChange} className='upload' />
       <button onClick={uploadVideo} disabled={loading}>
         uploadVideo
       </button>

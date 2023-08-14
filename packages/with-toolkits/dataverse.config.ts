@@ -46,22 +46,22 @@ export const config = {
       encryptable: [],
     },
     {
-      isPublicDomain: false, 
+      isPublicDomain: false,
       schemaName: "xmtpmessage.graphql",
       encryptable: ["content"],
     },
     {
-      isPublicDomain: false, 
+      isPublicDomain: false,
       schemaName: "xmtpkeycache.graphql",
       encryptable: ["keys"],
     },
     {
-      isPublicDomain: false, 
+      isPublicDomain: false,
       schemaName: "lenspublication.graphql",
       encryptable: [],
     },
     {
-      isPublicDomain: false, 
+      isPublicDomain: false,
       schemaName: "lenscollection.graphql",
       encryptable: [],
     },
@@ -74,7 +74,7 @@ export const config = {
       isPublicDomain: false, // default
       schemaName: "snapshotvote.graphql",
       encryptable: [], // strings within the schema and within the array represent fields that may be encrypted, while fields within the schema but not within the array represent fields that will definitely not be encrypted
-    }
+    },
   ],
   ceramicUrl: null, // leave null to use dataverse test Ceramic node. Set to {Your Ceramic node Url} for mainnet, should start with "https://".
 };

@@ -10,7 +10,9 @@
 
 ## Overview
 
-This is a basic example of a Dataverse dapp, which includes two models: `post` and `profile` with locate in `./base/models`. It demonstrates the process of creating, loading, monetizing, and unlocking a post by using Dataverse hooks.
+This is a basic example of a Dataverse dapp, which includes two models: `post`
+and `profile` with locate in `./base/models`. It demonstrates the process of
+creating, loading, monetizing, and unlocking a post by using Dataverse hooks.
 
 ## Run
 
@@ -34,9 +36,11 @@ pnpm install
 dataverseos deploy
 ```
 
-This step will need your private key to generate personal signature. Rest assured, Dataverse will not store or disclose your private key..
+This step will need your private key to generate personal signature. Rest
+assured, Dataverse will not store or disclose your private key..
 
-After successful deployment, you can find the generated `./output/app.json`, which contains various information about this new dapp.
+After successful deployment, you can find the generated `./output/app.json`,
+which contains various information about this new dapp.
 
 ### 4.Start
 

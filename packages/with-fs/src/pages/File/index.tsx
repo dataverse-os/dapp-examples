@@ -27,17 +27,17 @@ export const File = () => {
   const { pkh, foldersMap } = useStore();
 
   const currentFolderId = useMemo(() => {
-    if(foldersMap) {
+    if (foldersMap) {
       const sortedFolerIds = Object.keys(foldersMap)
         .filter(
-          (el) =>
+          el =>
             foldersMap[el].options.folderName !=
-            modelParser.output.defaultFolderName
+            modelParser.output.defaultFolderName,
         )
         .sort(
           (a, b) =>
             Date.parse(foldersMap[b].createdAt) -
-            Date.parse(foldersMap[a].createdAt)
+            Date.parse(foldersMap[a].createdAt),
         );
       return sortedFolerIds[0];
     } else {
@@ -47,40 +47,40 @@ export const File = () => {
 
   const { connectApp } = useApp({
     appId: modelParser.appId,
-    onSuccess: (result) => {
+    onSuccess: result => {
       console.log("[connect]connect app success, result:", result);
     },
   });
 
   const { uploadFile, uploadedFile } = useUploadFile({
-    onSuccess: (result) => {
+    onSuccess: result => {
       console.log("[uploadFile]upload file success, result:", result);
     },
   });
 
   const { updateFileBaseInfo, updatedFile } = useUpdateFileBaseInfo({
-    onSuccess: (result) => {
+    onSuccess: result => {
       console.log(
         "[updateFileBaseInfo]update file base info success, result:",
-        result
+        result,
       );
     },
   });
 
   const { moveFiles, movedFiles } = useMoveFiles({
-    onSuccess: (result) => {
+    onSuccess: result => {
       console.log("[moveFiles]move files success, result:", result);
     },
   });
 
   const { removeFiles, removedFiles } = useRemoveFiles({
-    onSuccess: (result) => {
+    onSuccess: result => {
       console.log("[removeFiles]remove files success, result:", result);
     },
   });
 
   const { monetizeFile, monetizedFile } = useMonetizeFile({
-    onSuccess: (result) => {
+    onSuccess: result => {
       console.log("[monetizeFile]monetize file success, result:", result);
     },
   });
@@ -132,7 +132,7 @@ export const File = () => {
       console.error("currentFolerId undefined, please readAllFolders first!");
       return;
     } else {
-      console.log("currentFolerId:", currentFolderId)
+      console.log("currentFolerId:", currentFolderId);
     }
     const file = uploadedFile as MirrorFile;
     moveFiles({
@@ -169,40 +169,40 @@ export const File = () => {
   return (
     <>
       <button onClick={connect}>connect</button>
-      <div className="black-text">{pkh}</div>
+      <div className='black-text'>{pkh}</div>
       {foldersMap && (
-        <div className="json-view">
+        <div className='json-view'>
           <ReactJson src={foldersMap} collapsed={true} />
         </div>
       )}
       <hr />
       <button onClick={handleUploadFile}>uploadFile</button>
       {uploadedFile && (
-        <div className="json-view">
+        <div className='json-view'>
           <ReactJson src={uploadedFile} collapsed={true} />
         </div>
       )}
       <button onClick={handleUpdateFileBaseInfo}>updateFileBaseInfo</button>
       {updatedFile && (
-        <div className="json-view">
+        <div className='json-view'>
           <ReactJson src={updatedFile} collapsed={true} />
         </div>
       )}
       <button onClick={handleMoveFiles}>moveFiles</button>
       {movedFiles && (
-        <div className="json-view">
+        <div className='json-view'>
           <ReactJson src={movedFiles} collapsed={true} />
         </div>
       )}
       <button onClick={handleRemoveFiles}>removeFiles</button>
       {removedFiles && (
-        <div className="json-view">
+        <div className='json-view'>
           <ReactJson src={removedFiles} collapsed={true} />
         </div>
       )}
       <button onClick={handleMonetizeFile}>monetizeFile</button>
       {monetizedFile && (
-        <div className="json-view">
+        <div className='json-view'>
           <ReactJson src={monetizedFile} collapsed={true} />
         </div>
       )}

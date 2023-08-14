@@ -10,9 +10,13 @@
 
 ## Overview
 
-This example adds some commonly used [dweb-toolkit](https://github.com/dataverse-os/dweb-toolkits) on top of the base. In this example, the models will be diverse and varied.
+This example adds some commonly used
+[dweb-toolkit](https://github.com/dataverse-os/dweb-toolkits) on top of the
+base. In this example, the models will be diverse and varied.
 
-In this example, each toolkit has its own models. In addition to the `post` and `profile` models in the base, you can find different toolkit models in the `./with-toolkits/models/toolkits` folder.
+In this example, each toolkit has its own models. In addition to the `post` and
+`profile` models in the base, you can find different toolkit models in the
+`./with-toolkits/models/toolkits` folder.
 
 ## Run
 
@@ -36,9 +40,11 @@ pnpm install
 dataverseos deploy
 ```
 
-This step will need your private key to generate personal signature. Rest assured, Dataverse will not store or disclose your private key..
+This step will need your private key to generate personal signature. Rest
+assured, Dataverse will not store or disclose your private key..
 
-After successful deployment, you can find the generated `./output/app.json`, which contains various information about this new dapp.
+After successful deployment, you can find the generated `./output/app.json`,
+which contains various information about this new dapp.
 
 ### 4.Start
 

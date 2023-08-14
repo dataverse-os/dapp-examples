@@ -25,7 +25,7 @@ import { publicProvider } from "wagmi/providers/public";
 
 const { chains, publicClient } = configureChains(
   [mainnet, goerli, polygon, polygonMumbai, bsc, bscTestnet],
-  [publicProvider()]
+  [publicProvider()],
 );
 
 const projectId = "a0e03b973ec9560c3f40607b20019762";
@@ -62,5 +62,5 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
         <App />
       </DataverseContextProvider>
     </RainbowKitProvider>
-  </WagmiConfig>
+  </WagmiConfig>,
 );

@@ -1,2 +1,2 @@
-export * from "./LivepeerPlayer"
-export * from "./LivepeerWidget"
+export * from "./LivepeerPlayer";
+export * from "./LivepeerWidget";

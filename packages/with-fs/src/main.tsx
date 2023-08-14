@@ -24,5 +24,5 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
     <AppContext.Provider value={{ appVersion, modelParser }}>
       <App />
     </AppContext.Provider>
-  </DataverseContextProvider>
+  </DataverseContextProvider>,
 );

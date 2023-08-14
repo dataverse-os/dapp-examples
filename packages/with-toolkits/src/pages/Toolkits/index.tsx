@@ -187,7 +187,7 @@ export const Toolkits = () => {
 
   const { connectApp } = useApp({
     appId: modelParser.appId,
-    onSuccess: (result) => {
+    onSuccess: result => {
       console.log("[connect]connect app success, result:", result);
     },
   });
@@ -215,7 +215,7 @@ export const Toolkits = () => {
     }
     const spams =
       await pushNotificationClientRef.current?.getUserSpamNotifications(
-        getICAPAddress(address)
+        getICAPAddress(address),
       );
     console.log("[getUserSpamNotifications]notifications:", spams);
   };
@@ -225,7 +225,7 @@ export const Toolkits = () => {
       await pushNotificationClientRef.current?.getNotificationsByUser(
         address!,
         1,
-        100
+        100,
       );
     console.log("[getNotificationsByUser]notifications:", notifications);
   };
@@ -235,7 +235,7 @@ export const Toolkits = () => {
       "eip155:5:0xd10d5b408A290a5FD0C2B15074995e899E944444";
     try {
       await pushNotificationClientRef.current?.subscribeChannel(
-        subscribeChannel
+        subscribeChannel,
       );
       console.log("[subscribe]done");
     } catch (error) {
@@ -248,7 +248,7 @@ export const Toolkits = () => {
       "eip155:5:0xd10d5b408A290a5FD0C2B15074995e899E944444";
     try {
       await pushNotificationClientRef.current?.unsubscribeChannel(
-        subscribeChannel
+        subscribeChannel,
       );
       console.log("[unsubscribe]done");
     } catch (error) {
@@ -270,20 +270,20 @@ export const Toolkits = () => {
         title,
         body,
         img,
-        cta
+        cta,
       );
       console.log("[sendNotification]res:", res);
     } catch (error: any) {
       if (error?.message === "this account does not have channel") {
         console.error(
-          "This Account doesn't have channel, please go to https://staging.push.org/ to create channel."
+          "This Account doesn't have channel, please go to https://staging.push.org/ to create channel.",
         );
       } else if (
         error?.response?.data?.error?.info ===
         "Error while verifying the verificationProof through eip712v2"
       ) {
         console.error(
-          "This Account doesn't have permission to sendNotification, please use your own channel to sendNotification or create a channel on https://staging.push.org/."
+          "This Account doesn't have permission to sendNotification, please use your own channel to sendNotification or create a channel on https://staging.push.org/.",
         );
       }
     }
@@ -304,7 +304,7 @@ export const Toolkits = () => {
       await pushNotificationClientRef.current?.getSubscriberOfChannel(
         queryChannel,
         page,
-        limit
+        limit,
       );
     console.log("[getSubscriberOfChannel]subscribers:", subscribers);
   };
@@ -315,7 +315,7 @@ export const Toolkits = () => {
       await pushNotificationClientRef.current?.searchChannelByName(
         searchName,
         1,
-        10
+        10,
       );
     console.log("[searchChannelByName]channelsData:", channelsData);
   };
@@ -340,7 +340,7 @@ export const Toolkits = () => {
     const response = await pushChatClientRef.current?.sendChatMessage(
       receiver,
       msgCont,
-      msgType
+      msgType,
     );
 
     console.log("sendChatMessage: response: ", response);
@@ -352,7 +352,7 @@ export const Toolkits = () => {
 
     const response = await pushChatClientRef.current?.fetchHistoryChats(
       receiver,
-      limit
+      limit,
     );
 
     console.log("FetchHistoryChats: response: ", response);
@@ -370,7 +370,7 @@ export const Toolkits = () => {
     }
     const isOnNetwork = await xmtpClientRef.current?.isUserOnNetwork(
       address,
-      "production"
+      "production",
     );
     console.log("isUserOnNetwork:", isOnNetwork);
   };
@@ -442,7 +442,7 @@ export const Toolkits = () => {
       lensClientRef.current?.lensContractsAddress.FreeCollectModule;
     const collectModuleInitData = ethers.utils.defaultAbiCoder.encode(
       ["bool"],
-      [false]
+      [false],
     ) as any;
     const modelId = postModel!.streams[0].modelId;
     const stream = {
@@ -494,7 +494,7 @@ export const Toolkits = () => {
       lensClientRef.current?.lensContractsAddress.FreeCollectModule;
     const collectModuleInitData = ethers.utils.defaultAbiCoder.encode(
       ["bool"],
-      [false]
+      [false],
     ) as any;
     const modelId = postModel!.streams[0].modelId;
     const stream = {
@@ -549,7 +549,7 @@ export const Toolkits = () => {
     // followerOnly: false
     const collectModuleInitData = ethers.utils.defaultAbiCoder.encode(
       ["bool"],
-      [false]
+      [false],
     ) as any;
     const collectModule = await lensClientRef.current?.getCollectModule({
       profileId: profileIdPointed,
@@ -582,7 +582,7 @@ export const Toolkits = () => {
     // followerOnly: false
     const collectModuleInitData = ethers.utils.defaultAbiCoder.encode(
       ["bool"],
-      [false]
+      [false],
     ) as any;
     const collectModule = await lensClientRef.current?.getCollectModule({
       profileId: profileIdPointed,
@@ -768,14 +768,14 @@ export const Toolkits = () => {
   const queryProposal = async () => {
     const res = await snapshotClientRef.current!.getProposalById(
       proposalId ??
-        "0x5d790744b950c5d60e025b3076e1a37022f6a5a2ffcf56ba38e2d85192997ede"
+        "0x5d790744b950c5d60e025b3076e1a37022f6a5a2ffcf56ba38e2d85192997ede",
     );
     console.log("[queryProposal]", res);
   };
 
   const querySpaceDetail = async () => {
     const res = await snapshotClientRef.current!.getSpaceDetail(
-      sId ?? spaceId ?? "toolkits.eth"
+      sId ?? spaceId ?? "toolkits.eth",
     );
     console.log("[querySpaceDetail]", res);
   };
@@ -791,12 +791,12 @@ export const Toolkits = () => {
   };
 
   return (
-    <div className="App">
+    <div className='App'>
       <button onClick={connect}>connect</button>
-      <div className="black-text">{pkh}</div>
+      <div className='black-text'>{pkh}</div>
       <hr />
 
-      <h2 className="label">Push Channel(Goerli Testnet)</h2>
+      <h2 className='label'>Push Channel(Goerli Testnet)</h2>
       <button onClick={getUserSubscriptions}>getUserSubscriptions</button>
       <button onClick={getUserSpamNotifications}>
         getUserSpamNotifications
@@ -811,14 +811,14 @@ export const Toolkits = () => {
       <button onClick={getNotificationList}>getNotificationList</button>
       <br />
 
-      <h2 className="label">Push Chat(Goerli Testnet)</h2>
+      <h2 className='label'>Push Chat(Goerli Testnet)</h2>
       <button onClick={createPushChatUser}>createPushChatUser</button>
       <button onClick={sendChatMessage}>sendChatMessage</button>
       <button onClick={fetchHistoryChats}>fetchHistoryChats</button>
       <button onClick={getChatMessageList}>getChatMessageList</button>
       <br />
 
-      <h2 className="label">Livepeer</h2>
+      <h2 className='label'>Livepeer</h2>
       {livepeerClientRef.current?.reactClient && (
         <>
           <LivepeerConfig client={livepeerClientRef.current.reactClient!}>
@@ -838,7 +838,7 @@ export const Toolkits = () => {
       )}
       <br />
 
-      <h2 className="label">Xmtp</h2>
+      <h2 className='label'>Xmtp</h2>
       <button onClick={isUserOnNetwork}>isUserOnNetowork</button>
       <button onClick={sendMessageToMsgReceiver}>
         sendMessageToMsgReceiver
@@ -849,14 +849,14 @@ export const Toolkits = () => {
       <button onClick={getPersistedMessages}>getPersistedMessages</button>
       <br />
 
-      <h2 className="label">Lens</h2>
+      <h2 className='label'>Lens</h2>
       <button onClick={createProfile}>createProfile</button>
       <button onClick={getProfiles}>getProfiles</button>
       <input
-        type="text"
+        type='text'
         value={profileId || ""}
-        placeholder="profileId"
-        onChange={(event) => setProfileId(event.target.value)}
+        placeholder='profileId'
+        onChange={event => setProfileId(event.target.value)}
       />
       <button onClick={postOnCeramic}>postOnCeramic</button>
       <button onClick={postOnCeramicWithSig}>postOnCeramicWithSig</button>
@@ -872,17 +872,17 @@ export const Toolkits = () => {
       <button onClick={getPersistedCollections}>getPersistedCollections</button>
       <br />
 
-      <h2 className="label">Snapshot</h2>
+      <h2 className='label'>Snapshot</h2>
       <input
-        type="text"
+        type='text'
         value={spaceId}
-        placeholder="spaceId: toolkits.eth"
-        onChange={(event) => setSpaceId(event.target.value)}
+        placeholder='spaceId: toolkits.eth'
+        onChange={event => setSpaceId(event.target.value)}
       />
       <button onClick={createProposal}>createProposal</button>
       <button onClick={getProposals}>getProposals</button>
       {proposals && (
-        <div className="json-view">
+        <div className='json-view'>
           <ReactJson src={proposals} collapsed={true} />
         </div>
       )}
@@ -890,17 +890,17 @@ export const Toolkits = () => {
       <button onClick={joinSpace}>joinSpace</button>
       <button onClick={getActions}>getActions</button>
       <input
-        type="text"
+        type='text'
         value={proposalId}
-        placeholder="proposalId"
-        onChange={(event) => setProposalId(event.target.value)}
+        placeholder='proposalId'
+        onChange={event => setProposalId(event.target.value)}
       />
       <button onClick={queryProposal}>queryProposal</button>
       <input
-        type="text"
+        type='text'
         value={sId}
-        placeholder="toolkits.eth"
-        onChange={(event) => setSId(event.target.value)}
+        placeholder='toolkits.eth'
+        onChange={event => setSId(event.target.value)}
       />
       <button onClick={querySpaceDetail}>querySpaceDetail</button>
       <button onClick={listVotes}>listVotes</button>

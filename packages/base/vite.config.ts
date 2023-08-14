@@ -1,5 +1,5 @@
-import { defineConfig } from "vite";
 import reactRefresh from "@vitejs/plugin-react-refresh";
+import { defineConfig } from "vite";
 
 export default defineConfig({
   plugins: [reactRefresh()],
@@ -16,7 +16,7 @@ export default defineConfig({
     exclude: ["@tableland/sqlparser", "stream/web", "util/types"],
   },
   build: {
-    outDir: './dist',
+    outDir: "./dist",
     target: "es2020",
     sourcemap: true,
   },
