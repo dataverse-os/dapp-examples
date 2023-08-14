@@ -1,5 +1,5 @@
 {
-  "name": "create-dataverse-app",
+  "name": "dapp-examples",
   "version": "1.0.0",
   "workspaces": [
     "packages/*"
