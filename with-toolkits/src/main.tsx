@@ -1,25 +1,32 @@
 import React from "react";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
 import ReactDOM from "react-dom/client";
 import App from "./App";
-import { ConfigProvider } from "./context/configContext";
-import { UserProvider } from "./context/userContext";
-import Toolkits from "./pages/toolkits";
+import { DataverseContextProvider } from "@dataverse/hooks";
+import pacakage from "../package.json";
+import app from "../output/app.json";
 import "./index.css";
 import "./global.css";
-import { DataverseContextProvider } from "@dataverse/hooks";
+import { ModelParser, Output } from "@dataverse/model-parser";
+import { WalletProvider } from "@dataverse/wallet-provider";
+
+const appVersion = pacakage.version;
+const modelParser = new ModelParser(app as Output);
+const walletProvider = new WalletProvider();
+
+export const AppContext = React.createContext<{
+  appVersion: string;
+  modelParser: ModelParser;
+  walletProvider: WalletProvider;
+}>({
+  appVersion,
+  modelParser,
+  walletProvider,
+});
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <DataverseContextProvider>
-    <ConfigProvider>
-      <UserProvider>
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<App />} />
-            <Route path="/toolkits" element={<Toolkits />} />
-          </Routes>
-        </BrowserRouter>
-      </UserProvider>
-    </ConfigProvider>
+    <AppContext.Provider value={{ appVersion, modelParser, walletProvider }}>
+      <App />
+    </AppContext.Provider>
   </DataverseContextProvider>
 );
