@@ -796,7 +796,7 @@ export const Toolkits = () => {
       <div className="black-text">{pkh}</div>
       <hr />
 
-      <h2 className="label">Push Channel</h2>
+      <h2 className="label">Push Channel(Goerli Testnet)</h2>
       <button onClick={getUserSubscriptions}>getUserSubscriptions</button>
       <button onClick={getUserSpamNotifications}>
         getUserSpamNotifications
@@ -811,7 +811,7 @@ export const Toolkits = () => {
       <button onClick={getNotificationList}>getNotificationList</button>
       <br />
 
-      <h2 className="label">Push Chat</h2>
+      <h2 className="label">Push Chat(Goerli Testnet)</h2>
       <button onClick={createPushChatUser}>createPushChatUser</button>
       <button onClick={sendChatMessage}>sendChatMessage</button>
       <button onClick={fetchHistoryChats}>fetchHistoryChats</button>
