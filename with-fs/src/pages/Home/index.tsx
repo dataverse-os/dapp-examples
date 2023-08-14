@@ -15,7 +15,7 @@ import { AppContext } from "../../main";
 import { Model } from "@dataverse/model-parser";
 import { useNavigate } from "react-router-dom";
 
-const App = () => {
+export const Home = () => {
   const { modelParser, appVersion } = useContext(AppContext);
   const navigate = useNavigate();
   const [postModel, setPostModel] = useState<Model>();
@@ -314,5 +314,3 @@ const App = () => {
     </>
   );
 };
-
-export default App;

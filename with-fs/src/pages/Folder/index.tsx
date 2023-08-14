@@ -14,7 +14,7 @@ import {
 import { AppContext } from "../../main";
 import { useNavigate } from "react-router-dom";
 
-const Folder = () => {
+export const Folder = () => {
   const { modelParser } = useContext(AppContext);
   const navigate = useNavigate();
 
@@ -192,5 +192,3 @@ const Folder = () => {
     </>
   );
 }
-
-export default Folder;

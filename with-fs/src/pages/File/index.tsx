@@ -17,7 +17,7 @@ import {
 import { AppContext } from "../../main";
 import { useNavigate } from "react-router-dom";
 
-const File = () => {
+export const File = () => {
   const { modelParser } = useContext(AppContext);
   const navigate = useNavigate();
 
@@ -214,5 +214,3 @@ const File = () => {
     </>
   );
 };
-
-export default File;
