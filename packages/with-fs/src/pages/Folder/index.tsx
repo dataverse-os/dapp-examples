@@ -50,13 +50,6 @@ export const Folder = () => {
       },
     });
 
-  const { changeFolderType, changedFolder: changedFolderType } =
-    useChangeFolderType({
-      onSuccess: result => {
-        console.log("[changeFolderType]create folder success, result:", result);
-      },
-    });
-
   const { readAllFolders, allFolders } = useReadAllFolders({
     onSuccess: result => {
       console.log("[readAllFolders]read all folders success, result:", result);
@@ -66,12 +59,6 @@ export const Folder = () => {
   const { deleteFolder, deletedFolder } = useDeleteFolder({
     onSuccess: result => {
       console.log("[deleteFolder]delete folder success, result:", result);
-    },
-  });
-
-  const { monetizeFolder, monetizedFolder } = useMonetizeFolder({
-    onSuccess: result => {
-      console.log("[monetizeFolder]monetize folder success, result:", result);
     },
   });
 
@@ -107,18 +94,6 @@ export const Folder = () => {
     readAllFolders();
   }, [readAllFolders]);
 
-  const handleChangeFolderType = useCallback(async () => {
-    if (!createdFolder) {
-      console.error("createFolderResult undefined");
-      return;
-    }
-    const folder = createdFolder as StructuredFolder;
-    changeFolderType({
-      folderId: folder.folderId,
-      targetFolderType: FolderType.Public,
-    });
-  }, [createdFolder, changeFolderType]);
-
   const handleDeleteFolder = useCallback(async () => {
     /* if (!createdFolder) {
       console.error("createFolderResult undefined");
@@ -129,21 +104,6 @@ export const Folder = () => {
       folderId: folder.folderId,
     });
   }, [createdFolder, deleteFolder]);
-
-  const handleMonetizeFolder = useCallback(async () => {
-    if (!createdFolder) {
-      console.error("createFolderResult undefined");
-      return;
-    }
-    const folder = createdFolder as StructuredFolder;
-    monetizeFolder({
-      folderId: folder.folderId,
-      folderDescription: "monetized folder description",
-      currency: Currency.WMATIC,
-      amount: 0.0001,
-      collectLimit: 1000,
-    });
-  }, [createdFolder, monetizeFolder]);
 
   return (
     <>
@@ -167,12 +127,6 @@ export const Folder = () => {
           <ReactJson src={changedFolderInfo} collapsed={true} />
         </div>
       )}
-      <button onClick={handleChangeFolderType}>changeFolderType</button>
-      {changedFolderType && (
-        <div className='json-view'>
-          <ReactJson src={changedFolderType} collapsed={true} />
-        </div>
-      )}
       <button onClick={handleReadAllFolders}>readAllFolders</button>
       {allFolders && (
         <div className='json-view'>
@@ -183,12 +137,6 @@ export const Folder = () => {
       {deletedFolder && (
         <div className='json-view'>
           <ReactJson src={deletedFolder} collapsed={true} />
-        </div>
-      )}
-      <button onClick={handleMonetizeFolder}>monetizeFolder</button>
-      {monetizedFolder && (
-        <div className='json-view'>
-          <ReactJson src={monetizedFolder} collapsed={true} />
         </div>
       )}
       <br />
