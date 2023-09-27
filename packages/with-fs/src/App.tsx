@@ -1,15 +1,20 @@
 import React from "react";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
-import { Folder, Home, File } from "./pages";
 
-const App = () => (
-  <BrowserRouter>
-    <Routes>
-      <Route path='/' element={<Home />} />
-      <Route path='/folder' element={<Folder />} />
-      <Route path='/file' element={<File />} />
-    </Routes>
-  </BrowserRouter>
-);
+import { RouterProvider, createBrowserRouter } from "react-router-dom";
+
+import { FileSystem, Home } from "./pages";
+
+const router = createBrowserRouter([
+  {
+    path: "/",
+    element: <Home />,
+  },
+  {
+    path: "/fs",
+    element: <FileSystem />,
+  },
+]);
+
+const App = () => <RouterProvider router={router} />;
 
 export default App;

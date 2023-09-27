@@ -1,28 +1,30 @@
 import "@rainbow-me/rainbowkit/styles.css";
-import { ConnectButton } from "@rainbow-me/rainbowkit";
 import React, { useState, useEffect, useCallback } from "react";
-import ReactJson from "react-json-view";
+
 import { Currency } from "@dataverse/dataverse-connector";
 import {
-  StreamType,
   useApp,
-  useCreateStream,
+  useCollectFile,
+  useCreateFile,
+  useDatatokenInfo,
   useFeedsByAddress,
-  useMonetizeStream,
+  useMonetizeFile,
   useStore,
-  useUnlockStream,
-  useUpdateStream,
+  useUnlockFile,
+  useUpdateFile,
 } from "@dataverse/hooks";
 import { Model, ModelParser, Output } from "@dataverse/model-parser";
-import app from "../output/app.json";
-import pacakage from "../package.json";
+import { ConnectButton } from "@rainbow-me/rainbowkit";
+import ReactJson from "react-json-view";
 
-const appVersion = pacakage.version;
+import app from "../output/app.json";
+
+const postVersion = "0.0.1";
 const modelParser = new ModelParser(app as Output);
 
 const App = () => {
   const [postModel, setPostModel] = useState<Model>();
-  const [currentStreamId, setCurrentStreamId] = useState<string>();
+  const [currentFileId, setCurrentFileId] = useState<string>();
 
   useEffect(() => {
     const postModel = modelParser.getModelByName("post");
@@ -32,7 +34,7 @@ const App = () => {
   /**
    * @summary import from @dataverse/hooks
    */
-  const { address, pkh, streamsMap: posts } = useStore();
+  const { pkh, filesMap: posts } = useStore();
 
   const { connectApp } = useApp({
     appId: modelParser.appId,
@@ -42,68 +44,64 @@ const App = () => {
     },
   });
 
-  const { createdStream: publicPost, createStream: createPublicStream } =
-    useCreateStream({
-      streamType: StreamType.Public,
-      onSuccess: (result: any) => {
-        console.log("[createPublicPost]create public stream success:", result);
-        setCurrentStreamId(result.streamId);
-      },
-    });
+  const { createdFile, createFile } = useCreateFile({
+    onSuccess: result => {
+      console.log("[createFile]create file success:", result);
+      setCurrentFileId(result.fileContent.file.fileId);
+    },
+  });
 
-  const { createdStream: encryptedPost, createStream: createEncryptedStream } =
-    useCreateStream({
-      streamType: StreamType.Encrypted,
-      onSuccess: (result: any) => {
+  const { createdFile: createdEncryptedFile, createFile: createEncryptedFile } =
+    useCreateFile({
+      onSuccess: result => {
         console.log(
-          "[createEncryptedPost]create encrypted stream success:",
+          "[createEncryptedFile]create encrypted file success:",
           result,
         );
-        setCurrentStreamId(result.streamId);
-      },
-    });
-
-  const { createdStream: payablePost, createStream: createPayableStream } =
-    useCreateStream({
-      streamType: StreamType.Payable,
-      onSuccess: (result: any) => {
-        console.log(
-          "[createPayablePost]create payable stream success:",
-          result,
-        );
-        setCurrentStreamId(result.streamId);
+        setCurrentFileId(result.fileContent.file.fileId);
       },
     });
 
   const { loadFeedsByAddress } = useFeedsByAddress({
     onError: error => {
-      console.error("[loadPosts]load streams failed,", error);
+      console.error("[loadPosts]load files failed,", error);
     },
     onSuccess: result => {
-      console.log("[loadPosts]load streams success, result:", result);
+      console.log("[loadPosts]load files success, result:", result);
     },
   });
 
-  const { updatedStreamContent: updatedPost, updateStream } = useUpdateStream({
+  const { updatedFileContent: updatedPost, updateFile } = useUpdateFile({
     onSuccess: result => {
-      console.log("[updatePost]update stream success, result:", result);
+      console.log("[updateFile]update file success, result:", result);
     },
   });
 
-  const { monetizedStreamContent: monetizedPost, monetizeStream } =
-    useMonetizeStream({
-      onSuccess: result => {
-        console.log("[monetize]monetize stream success, result:", result);
-      },
-    });
-
-  const { unlockedStreamContent: unlockedPost, unlockStream } = useUnlockStream(
+  const { monetizedFileContent: monetizedPost, monetizeFile } = useMonetizeFile(
     {
       onSuccess: result => {
-        console.log("[unlockPost]unlock stream success, result:", result);
+        console.log("[monetize]monetize file success, result:", result);
       },
     },
   );
+
+  const { datatokenInfo, getDatatokenInfo } = useDatatokenInfo({
+    onSuccess: result => {
+      console.log("[datatokenInfo]get datatoken info success, result:", result);
+    },
+  });
+
+  const { collectedFileContent: collectedPost, collectFile } = useCollectFile({
+    onSuccess: result => {
+      console.log("[collectFile]collect file success, result:", result);
+    },
+  });
+
+  const { unlockedFileContent: unlockedPost, unlockFile } = useUnlockFile({
+    onSuccess: result => {
+      console.log("[unlockPost]unlock file success, result:", result);
+    },
+  });
 
   /**
    * @summary custom methods
@@ -112,16 +110,17 @@ const App = () => {
     connectApp();
   }, [connectApp]);
 
-  const createPublicPost = useCallback(async () => {
+  const createPost = useCallback(async () => {
     if (!postModel) {
       console.error("postModel undefined");
       return;
     }
 
-    createPublicStream({
+    createFile({
       modelId: postModel.streams[postModel.streams.length - 1].modelId,
-      stream: {
-        appVersion,
+      fileName: "create file test",
+      fileContent: {
+        modelVersion: postVersion,
         text: "hello",
         images: [
           "https://bafkreib76wz6wewtkfmp5rhm3ep6tf4xjixvzzyh64nbyge5yhjno24yl4.ipfs.w3s.link",
@@ -131,7 +130,7 @@ const App = () => {
         updatedAt: new Date().toISOString(),
       },
     });
-  }, [postModel, createPublicStream]);
+  }, [postModel, createFile]);
 
   const createEncryptedPost = useCallback(async () => {
     if (!postModel) {
@@ -139,57 +138,26 @@ const App = () => {
       return;
     }
 
-    const date = new Date().toISOString();
-
-    createEncryptedStream({
+    createEncryptedFile({
       modelId: postModel.streams[postModel.streams.length - 1].modelId,
-      stream: {
-        appVersion,
+      fileName: "create file test",
+      fileContent: {
+        modelVersion: postVersion,
         text: "hello",
         images: [
           "https://bafkreib76wz6wewtkfmp5rhm3ep6tf4xjixvzzyh64nbyge5yhjno24yl4.ipfs.w3s.link",
         ],
         videos: [],
-        createdAt: date,
-        updatedAt: date,
-      },
-      encrypted: {
-        text: true,
-        images: true,
-        videos: false,
-      },
-    });
-  }, [postModel, createEncryptedStream]);
-
-  const createPayablePost = useCallback(async () => {
-    if (!postModel) {
-      console.error("postModel undefined");
-      return;
-    }
-
-    const date = new Date().toISOString();
-    createPayableStream({
-      modelId: postModel.streams[postModel.streams.length - 1].modelId,
-      stream: {
-        appVersion,
-        text: "metaverse",
-        images: [
-          "https://bafkreidhjbco3nh4uc7wwt5c7auirotd76ch6hlzpps7bwdvgckflp7zmi.ipfs.w3s.link/",
-        ],
-        videos: [],
-        createdAt: date,
-        updatedAt: date,
-      },
-      currency: Currency.WMATIC,
-      amount: 0.0001,
-      collectLimit: 1000,
-      encrypted: {
-        text: true,
-        images: true,
-        videos: false,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        encrypted: {
+          text: true,
+          images: true,
+          videos: false,
+        },
       },
     });
-  }, [postModel, address, pkh, createPayableStream]);
+  }, [postModel, createEncryptedFile]);
 
   const loadPosts = useCallback(async () => {
     if (!postModel) {
@@ -212,19 +180,19 @@ const App = () => {
       console.error("postModel undefined");
       return;
     }
-    if (!currentStreamId) {
-      console.error("currentStreamId undefined");
+    if (!currentFileId) {
+      console.error("currentFileId undefined");
       return;
     }
-    updateStream({
+    updateFile({
       model: postModel,
-      streamId: currentStreamId,
-      stream: {
+      fileId: currentFileId,
+      fileName: "update file test",
+      fileContent: {
         text: "update my post -- " + new Date().toISOString(),
         images: [
           "https://bafkreidhjbco3nh4uc7wwt5c7auirotd76ch6hlzpps7bwdvgckflp7zmi.ipfs.w3s.link",
         ],
-        updatedAt: new Date().toISOString(),
       },
       encrypted: {
         text: true,
@@ -232,33 +200,49 @@ const App = () => {
         videos: false,
       },
     });
-  }, [postModel, currentStreamId, updateStream]);
+  }, [postModel, currentFileId, updateFile]);
 
   const monetizePost = useCallback(async () => {
     if (!postModel) {
       console.error("postModel undefined");
       return;
     }
-    if (!currentStreamId) {
-      console.error("currentStreamId undefined");
+    if (!currentFileId) {
+      console.error("currentFileId undefined");
       return;
     }
 
-    monetizeStream({
-      streamId: currentStreamId,
+    monetizeFile({
+      fileId: currentFileId,
       currency: Currency.WMATIC,
       amount: 0.0001,
       collectLimit: 1000,
     });
-  }, [postModel, currentStreamId, monetizeStream]);
+  }, [postModel, currentFileId, monetizeFile]);
 
-  const unlockPost = useCallback(async () => {
-    if (!currentStreamId) {
-      console.error("currentStreamId undefined");
+  const getDatatokenInfoByFileId = useCallback(async () => {
+    if (!currentFileId) {
+      console.error("currentFileId undefined");
       return;
     }
-    unlockStream(currentStreamId);
-  }, [currentStreamId, unlockStream]);
+    getDatatokenInfo(currentFileId);
+  }, [getDatatokenInfo, currentFileId]);
+
+  const collectPost = useCallback(async () => {
+    if (!currentFileId) {
+      console.error("currentFileId undefined");
+      return;
+    }
+    collectFile(currentFileId);
+  }, [collectFile]);
+
+  const unlockPost = useCallback(async () => {
+    if (!currentFileId) {
+      console.error("currentFileId undefined");
+      return;
+    }
+    unlockFile(currentFileId);
+  }, [unlockFile]);
 
   return (
     <>
@@ -268,27 +252,18 @@ const App = () => {
       <button onClick={connect}>connect</button>
       <div className='black-text'>{pkh}</div>
       <hr />
-      <button onClick={createPublicPost}>createPublicPost</button>
-      {publicPost && (
+      <button onClick={createPost}>createPost</button>
+      {createdFile && (
         <div className='json-view'>
-          <ReactJson src={publicPost} collapsed={true} />
+          <ReactJson src={createdFile} collapsed={true} />
         </div>
       )}
       <button onClick={createEncryptedPost}>createEncryptedPost</button>
-      {encryptedPost && (
+      {createdEncryptedFile && (
         <div className='json-view'>
-          <ReactJson src={encryptedPost} collapsed={true} />
+          <ReactJson src={createdEncryptedFile} collapsed={true} />
         </div>
       )}
-      <button onClick={createPayablePost}>createPayablePost</button>
-      {payablePost && (
-        <div className='json-view'>
-          <ReactJson src={payablePost} collapsed={true} />
-        </div>
-      )}
-      <div className='red'>
-        You need a testnet lens profile to monetize data.
-      </div>
       <button onClick={loadPosts}>loadPosts</button>
       {posts && (
         <div className='json-view'>
@@ -305,6 +280,23 @@ const App = () => {
       {monetizedPost && (
         <div className='json-view'>
           <ReactJson src={monetizedPost} collapsed={true} />
+        </div>
+      )}
+      <button onClick={getDatatokenInfoByFileId}>datatokenInfo</button>
+      {datatokenInfo && (
+        <div className='json-view'>
+          <ReactJson src={datatokenInfo} collapsed={true} />
+        </div>
+      )}
+      <br />
+      <div className='red'>
+        You need to switch another account to collect the post and unlock the
+        post.
+      </div>
+      <button onClick={collectPost}>collectPost</button>
+      {collectedPost && (
+        <div className='json-view'>
+          <ReactJson src={collectedPost} collapsed={true} />
         </div>
       )}
       <button onClick={unlockPost}>unlockPost</button>
