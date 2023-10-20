@@ -1,13 +1,16 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import App from "./App";
+
 import { DataverseContextProvider } from "@dataverse/hooks";
-import pacakage from "../package.json";
-import app from "../output/app.json";
-import "./index.css";
-import "./global.css";
 import { ModelParser, Output } from "@dataverse/model-parser";
 import { WalletProvider } from "@dataverse/wallet-provider";
+
+import App from "./App";
+import app from "../output/app.json";
+import pacakage from "../package.json";
+
+import "./index.css";
+import "./global.css";
 
 const appVersion = pacakage.version;
 const modelParser = new ModelParser(app as Output);

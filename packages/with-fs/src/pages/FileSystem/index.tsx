@@ -3,7 +3,6 @@ import React, { useState, useCallback, useContext } from "react";
 import {
   ActionType,
   Currency,
-  FolderType,
   MirrorFile,
   StorageProviderName,
   StructuredFolder,
@@ -14,16 +13,16 @@ import {
   useCollectDataUnion,
   useCreateActionFile,
   useCreateBareFile,
-  useCreateDataUnion,
   useCreateFolder,
   useCreateProfile,
   useDeleteDataUnion,
   useDeleteFolder,
+  useLoadBareFileContent,
+  useLoadDataUnions,
+  useLoadFolders,
   useMoveFiles,
   useProfiles,
-  useReadBareFileContent,
-  useReadDataUnions,
-  useReadFolders,
+  usePublishDataUnion,
   useRemoveFiles,
   useStore,
   useUpdateActionFile,
@@ -69,7 +68,7 @@ export const FileSystem = () => {
       },
     });
 
-  const { readFolders } = useReadFolders({
+  const { loadFolders } = useLoadFolders({
     onSuccess: result => {
       console.log("[readAllFolders]read all folders success, result:", result);
     },
@@ -87,8 +86,8 @@ export const FileSystem = () => {
     },
   });
 
-  const { fileContent: bareFileContent, readBareFileContent } =
-    useReadBareFileContent({
+  const { fileContent: bareFileContent, loadBareFileContent } =
+    useLoadBareFileContent({
       onSuccess: result => {
         console.log(
           "[readBareFileContent]read bare file content success, result:",
@@ -133,13 +132,13 @@ export const FileSystem = () => {
     },
   });
 
-  const { readDataUnions } = useReadDataUnions({
+  const { loadDataUnions } = useLoadDataUnions({
     onSuccess: result => {
       console.log("[readDataUnions]read data unions success, result:", result);
     },
   });
 
-  const { createdDataUnion, createDataUnion } = useCreateDataUnion({
+  const { publishedDataUnion, publishDataUnion } = usePublishDataUnion({
     onSuccess: result => {
       console.log(
         "[createDataUnion]create data union success, result:",
@@ -187,7 +186,6 @@ export const FileSystem = () => {
 
   const handleCreateFolder = useCallback(async () => {
     createFolder({
-      folderType: FolderType.PrivateFolderType,
       folderName: "example",
       folderDescription: "example description",
     });
@@ -201,14 +199,14 @@ export const FileSystem = () => {
     const folder = createdFolder as StructuredFolder;
     changeFolderBaseInfo({
       folderId: folder.folderId,
-      newFolderName: "changed",
-      newFolderDescription: "changed description",
+      folderName: "changed",
+      folderDescription: "changed description",
     });
   }, [createdFolder, changeFolderBaseInfo]);
 
   const handleReadAllFolders = useCallback(async () => {
-    readFolders();
-  }, [readFolders]);
+    loadFolders();
+  }, [loadFolders]);
 
   const handleDeleteFolder = useCallback(async () => {
     /* if (!createdFolder) {
@@ -235,7 +233,7 @@ export const FileSystem = () => {
         name,
         apiKey,
       },
-      dataUnionId: (createdDataUnion as StructuredFolder)?.folderId,
+      dataUnionId: (publishedDataUnion as StructuredFolder)?.folderId,
     });
   }, [createdFolder, createBareFile]);
 
@@ -244,8 +242,8 @@ export const FileSystem = () => {
       console.error("createdBareFile undefined");
       return;
     }
-    readBareFileContent((createdBareFile as MirrorFile)?.fileId);
-  }, [createdBareFile, readBareFileContent]);
+    loadBareFileContent((createdBareFile as MirrorFile)?.fileId);
+  }, [createdBareFile, loadBareFileContent]);
 
   const handleUpdateBareFile = useCallback(async () => {
     if (!createdBareFile) {
@@ -332,15 +330,15 @@ export const FileSystem = () => {
   }, [createdBareFile, createdActionFile, removeFiles]);
 
   const handleReadDataUnions = useCallback(async () => {
-    readDataUnions();
-  }, [readDataUnions]);
+    loadDataUnions();
+  }, [loadDataUnions]);
 
   const handleCreateDataUnion = useCallback(async () => {
     if (!profileId && (!profileIds || profileIds.length === 0)) {
       console.error("please createProfile or getProfiles first!");
       return;
     }
-    createDataUnion({
+    publishDataUnion({
       dataUnionName: "data union",
       // contentType: { resource: StorageResource.CERAMIC, resourceId: modelId },
       // contentType: { resource: StorageResource.IPFS },
@@ -352,25 +350,25 @@ export const FileSystem = () => {
         currency: Currency.WMATIC,
       },
     });
-  }, [profileId, profileIds, createDataUnion]);
+  }, [profileId, profileIds, publishDataUnion]);
 
   const handleCollectDataUnion = useCallback(async () => {
-    if (!createdDataUnion) {
-      console.error("createdDataUnion undefined");
+    if (!publishedDataUnion) {
+      console.error("publishedDataUnion undefined");
       return;
     }
-    collectDataUnion((createdDataUnion as StructuredFolder)?.folderId);
-  }, [createdDataUnion, collectDataUnion]);
+    collectDataUnion((publishedDataUnion as StructuredFolder)?.folderId);
+  }, [publishedDataUnion, collectDataUnion]);
 
   const handleDeleteDataUnion = useCallback(async () => {
-    if (!createdDataUnion) {
-      console.error("createdDataUnion undefined");
+    if (!publishedDataUnion) {
+      console.error("publishedDataUnion undefined");
       return;
     }
     deleteDataUnion({
-      dataUnionId: (createdDataUnion as StructuredFolder)?.folderId,
+      dataUnionId: (publishedDataUnion as StructuredFolder)?.folderId,
     });
-  }, [createdDataUnion, deleteDataUnion]);
+  }, [publishedDataUnion, deleteDataUnion]);
 
   const handleGetProfiles = useCallback(async () => {
     getProfiles();
@@ -424,7 +422,7 @@ export const FileSystem = () => {
       <button onClick={handleReadBareFileContent}>readBareFileContent</button>
       {bareFileContent && (
         <div className='json-view'>
-          <ReactJson src={bareFileContent} collapsed={true} />
+          <ReactJson src={{ bareFileContent }} collapsed={true} />
         </div>
       )}
       <button onClick={handleUpdateBareFile}>updateBareFile</button>
@@ -469,9 +467,9 @@ export const FileSystem = () => {
         You need to have lens profile before create a dataUnion.
       </div>
       <button onClick={handleCreateDataUnion}>createDataUnion</button>
-      {createdDataUnion && (
+      {publishedDataUnion && (
         <div className='json-view'>
-          <ReactJson src={createdDataUnion} collapsed={true} />
+          <ReactJson src={publishedDataUnion} collapsed={true} />
         </div>
       )}
       <button onClick={handleDeleteDataUnion}>deleteDataUnion</button>

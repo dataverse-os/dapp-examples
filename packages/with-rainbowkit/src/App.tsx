@@ -5,13 +5,13 @@ import { Currency } from "@dataverse/dataverse-connector";
 import {
   useApp,
   useCollectFile,
-  useCreateFile,
+  useCreateIndexFile,
   useDatatokenInfo,
   useFeedsByAddress,
   useMonetizeFile,
   useStore,
   useUnlockFile,
-  useUpdateFile,
+  useUpdateIndexFile,
 } from "@dataverse/hooks";
 import { Model, ModelParser, Output } from "@dataverse/model-parser";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
@@ -44,23 +44,25 @@ const App = () => {
     },
   });
 
-  const { createdFile, createFile } = useCreateFile({
+  const { createdIndexFile, createIndexFile } = useCreateIndexFile({
     onSuccess: result => {
       console.log("[createFile]create file success:", result);
       setCurrentFileId(result.fileContent.file.fileId);
     },
   });
 
-  const { createdFile: createdEncryptedFile, createFile: createEncryptedFile } =
-    useCreateFile({
-      onSuccess: result => {
-        console.log(
-          "[createEncryptedFile]create encrypted file success:",
-          result,
-        );
-        setCurrentFileId(result.fileContent.file.fileId);
-      },
-    });
+  const {
+    createdIndexFile: createdEncryptedFile,
+    createIndexFile: createEncryptedFile,
+  } = useCreateIndexFile({
+    onSuccess: result => {
+      console.log(
+        "[createEncryptedFile]create encrypted file success:",
+        result,
+      );
+      setCurrentFileId(result.fileContent.file.fileId);
+    },
+  });
 
   const { loadFeedsByAddress } = useFeedsByAddress({
     onError: error => {
@@ -71,11 +73,12 @@ const App = () => {
     },
   });
 
-  const { updatedFileContent: updatedPost, updateFile } = useUpdateFile({
-    onSuccess: result => {
-      console.log("[updateFile]update file success, result:", result);
-    },
-  });
+  const { updatedFileContent: updatedPost, updateIndexFile } =
+    useUpdateIndexFile({
+      onSuccess: result => {
+        console.log("[updateFile]update file success, result:", result);
+      },
+    });
 
   const { monetizedFileContent: monetizedPost, monetizeFile } = useMonetizeFile(
     {
@@ -116,7 +119,7 @@ const App = () => {
       return;
     }
 
-    createFile({
+    createIndexFile({
       modelId: postModel.streams[postModel.streams.length - 1].modelId,
       fileName: "create file test",
       fileContent: {
@@ -130,7 +133,7 @@ const App = () => {
         updatedAt: new Date().toISOString(),
       },
     });
-  }, [postModel, createFile]);
+  }, [postModel, createIndexFile]);
 
   const createEncryptedPost = useCallback(async () => {
     if (!postModel) {
@@ -176,16 +179,11 @@ const App = () => {
   }, [postModel, pkh, loadFeedsByAddress]);
 
   const updatePost = useCallback(async () => {
-    if (!postModel) {
-      console.error("postModel undefined");
-      return;
-    }
     if (!currentFileId) {
       console.error("currentFileId undefined");
       return;
     }
-    updateFile({
-      model: postModel,
+    updateIndexFile({
       fileId: currentFileId,
       fileName: "update file test",
       fileContent: {
@@ -200,13 +198,9 @@ const App = () => {
         videos: false,
       },
     });
-  }, [postModel, currentFileId, updateFile]);
+  }, [currentFileId, updateIndexFile]);
 
   const monetizePost = useCallback(async () => {
-    if (!postModel) {
-      console.error("postModel undefined");
-      return;
-    }
     if (!currentFileId) {
       console.error("currentFileId undefined");
       return;
@@ -214,11 +208,14 @@ const App = () => {
 
     monetizeFile({
       fileId: currentFileId,
-      currency: Currency.WMATIC,
-      amount: 0.0001,
-      collectLimit: 1000,
+      datatokenVars: {
+        currency: Currency.WMATIC,
+        amount: 0.0001,
+        collectLimit: 1000,
+      },
+      unlockingTimeStamp: String(Date.now() / 1000 + 5 * 60),
     });
-  }, [postModel, currentFileId, monetizeFile]);
+  }, [currentFileId, monetizeFile]);
 
   const getDatatokenInfoByFileId = useCallback(async () => {
     if (!currentFileId) {
@@ -253,9 +250,9 @@ const App = () => {
       <div className='black-text'>{pkh}</div>
       <hr />
       <button onClick={createPost}>createPost</button>
-      {createdFile && (
+      {createdIndexFile && (
         <div className='json-view'>
-          <ReactJson src={createdFile} collapsed={true} />
+          <ReactJson src={createdIndexFile} collapsed={true} />
         </div>
       )}
       <button onClick={createEncryptedPost}>createEncryptedPost</button>
