@@ -1,4 +1,5 @@
 import React from "react";
+
 import { Player, ReactClient } from "@livepeer/react";
 
 interface IProps {
@@ -6,7 +7,7 @@ interface IProps {
   playbackId: string;
 }
 
-export const LivepeerPlayer = ({ reactClient, playbackId }: IProps) => {
+export const LivepeerPlayer = ({ playbackId }: IProps) => {
   return (
     <Player
       title='Waterfalls'

@@ -5,23 +5,9 @@ import React, {
   useCallback,
   useContext,
 } from "react";
+
+import { Currency } from "@dataverse/dataverse-connector";
 import { useApp, useStore } from "@dataverse/hooks";
-import {
-  PushNotificationClient,
-  PushChatClient,
-  ENV,
-  ModelType as PushModelType,
-  getICAPAddress,
-} from "@dataverse/push-client-toolkit";
-
-import LivepeerClient, {
-  LivepeerConfig,
-} from "@dataverse/livepeer-client-toolkit";
-
-import XmtpClient, {
-  ModelType as XmtpModelType,
-} from "@dataverse/xmtp-client-toolkit";
-
 import LensClient, {
   CommentData,
   LensNetwork,
@@ -29,7 +15,17 @@ import LensClient, {
   ModelType as LensModelType,
   PostData,
 } from "@dataverse/lens-client-toolkit";
-
+import LivepeerClient, {
+  LivepeerConfig,
+} from "@dataverse/livepeer-client-toolkit";
+import { Model } from "@dataverse/model-parser";
+import {
+  PushNotificationClient,
+  PushChatClient,
+  ENV,
+  ModelType as PushModelType,
+  getICAPAddress,
+} from "@dataverse/push-client-toolkit";
 import SnapshotClient, {
   ModelType as snapshotModelType,
   SNAP_SHOT_HUB,
@@ -41,12 +37,13 @@ import SnapshotClient, {
   Proposal,
   Vote,
 } from "@dataverse/snapshot-client-toolkit";
-
-import { LivepeerWidget, LivepeerPlayer } from "../../components";
+import XmtpClient, {
+  ModelType as XmtpModelType,
+} from "@dataverse/xmtp-client-toolkit";
 import { ethers } from "ethers";
 import ReactJson from "react-json-view";
-import { Model } from "@dataverse/model-parser";
-import { Currency } from "@dataverse/dataverse-connector";
+
+import { LivepeerWidget, LivepeerPlayer } from "../../components";
 import { AppContext } from "../../main";
 
 const TEN_MINUTES = 10 * 60;
@@ -109,12 +106,11 @@ export const Toolkits = () => {
       const pushChatClient = new PushChatClient({
         dataverseConnector,
         modelIds: {
-          [PushModelType.MESSAGE]: pushChatMessageModel?.streams[0].modelId!,
-          [PushModelType.USER_PGP_KEY]:
-            pushChatGPGKeyModel?.streams[0].modelId!,
-          [PushModelType.CHANNEL]: pushChannelModel?.streams[0].modelId!,
+          [PushModelType.MESSAGE]: pushChatMessageModel?.streams[0].modelId,
+          [PushModelType.USER_PGP_KEY]: pushChatGPGKeyModel?.streams[0].modelId,
+          [PushModelType.CHANNEL]: pushChannelModel?.streams[0].modelId,
           [PushModelType.NOTIFICATION]:
-            pushNotificationModel?.streams[0].modelId!,
+            pushNotificationModel?.streams[0].modelId,
         },
         env: ENV.STAGING,
       });
@@ -125,12 +121,11 @@ export const Toolkits = () => {
       const pushNotificationClient = new PushNotificationClient({
         dataverseConnector,
         modelIds: {
-          [PushModelType.MESSAGE]: pushChatMessageModel?.streams[0].modelId!,
-          [PushModelType.USER_PGP_KEY]:
-            pushChatGPGKeyModel?.streams[0].modelId!,
-          [PushModelType.CHANNEL]: pushChannelModel?.streams[0].modelId!,
+          [PushModelType.MESSAGE]: pushChatMessageModel?.streams[0].modelId,
+          [PushModelType.USER_PGP_KEY]: pushChatGPGKeyModel?.streams[0].modelId,
+          [PushModelType.CHANNEL]: pushChannelModel?.streams[0].modelId,
           [PushModelType.NOTIFICATION]:
-            pushNotificationModel?.streams[0].modelId!,
+            pushNotificationModel?.streams[0].modelId,
         },
         env: ENV.STAGING,
       });
@@ -176,8 +171,8 @@ export const Toolkits = () => {
         dataverseConnector,
         modelIds: {
           [snapshotModelType.PROPOSAL]:
-            snapshotproposalModel?.streams[0].modelId!,
-          [snapshotModelType.VOTE]: snapshotvoteModel?.streams[0].modelId!,
+            snapshotproposalModel?.streams[0].modelId,
+          [snapshotModelType.VOTE]: snapshotvoteModel?.streams[0].modelId,
         },
         env: SNAP_SHOT_HUB.dev,
       });

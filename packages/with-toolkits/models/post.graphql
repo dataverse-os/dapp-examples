@@ -1,7 +1,5 @@
 type post @createModel(accountRelation: LIST, description: "post") {
-  author: DID! @documentAccount
-  version: CommitID! @documentVersion
-  appVersion: String! @string(maxLength: 100)
+  modelVersion: String! @string(maxLength: 100)
   text: String @string(maxLength: 300000000)
   images: [String] @list(maxLength: 10000000) @string(maxLength: 2000000)
   videos: [String] @list(maxLength: 10000000) @string(maxLength: 2000000)

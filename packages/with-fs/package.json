@@ -11,15 +11,16 @@
   "license": "MIT",
   "dependencies": {
     "@composedb/devtools": "^0.4.4",
-    "@dataverse/dataverse-connector": "^1.0.25",
-    "@dataverse/hooks": "^1.0.25",
+    "@dataverse/dataverse-connector": "^1.0.30",
+    "@dataverse/hooks": "^1.0.31",
     "@dataverse/model-parser": "^1.0.2",
     "ethers": "5.6.9",
     "path": "^0.12.7",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-json-view": "^1.21.3",
-    "react-router-dom": "^6.13.0"
+    "react-router": "^6.16.0",
+    "react-router-dom": "^6.15.0"
   },
   "devDependencies": {
     "@types/node": "^18.15.11",
