@@ -2,7 +2,9 @@ import React, { useState, useCallback, useContext } from "react";
 
 import {
   ActionType,
+  ChainId,
   Currency,
+  // DatatokenType,
   MirrorFile,
   StorageProviderName,
   StructuredFolder,
@@ -18,7 +20,7 @@ import {
   useDeleteDataUnion,
   useDeleteFolder,
   useLoadBareFileContent,
-  useLoadDataUnions,
+  useLoadCreatedDataUnions,
   useLoadFolders,
   useMoveFiles,
   useProfiles,
@@ -33,6 +35,7 @@ import { useNavigate } from "react-router-dom";
 
 import { AppContext } from "../../main";
 
+// const datatokenType = DatatokenType.Profileless;
 export const FileSystem = () => {
   const { modelParser } = useContext(AppContext);
   const navigate = useNavigate();
@@ -132,7 +135,7 @@ export const FileSystem = () => {
     },
   });
 
-  const { loadDataUnions } = useLoadDataUnions({
+  const { loadCreatedDataUnions } = useLoadCreatedDataUnions({
     onSuccess: result => {
       console.log("[readDataUnions]read data unions success, result:", result);
     },
@@ -330,8 +333,8 @@ export const FileSystem = () => {
   }, [createdBareFile, createdActionFile, removeFiles]);
 
   const handleReadDataUnions = useCallback(async () => {
-    loadDataUnions();
-  }, [loadDataUnions]);
+    loadCreatedDataUnions();
+  }, [loadCreatedDataUnions]);
 
   const handleCreateDataUnion = useCallback(async () => {
     if (!profileId && (!profileIds || profileIds.length === 0)) {
@@ -344,10 +347,12 @@ export const FileSystem = () => {
       // contentType: { resource: StorageResource.IPFS },
       // actionType: ActionType.LIKE,
       dataUnionVars: {
-        profileId: (profileId || profileIds?.[0]) as string,
-        collectLimit: 100,
-        amount: 0.0001,
-        currency: Currency.WMATIC,
+        datatokenVars: {
+          profileId: (profileId || profileIds?.[0]) as string,
+          collectLimit: 100,
+          amount: 0.0001,
+          currency: Currency.WMATIC,
+        },
       },
     });
   }, [profileId, profileIds, publishDataUnion]);
@@ -371,7 +376,10 @@ export const FileSystem = () => {
   }, [publishedDataUnion, deleteDataUnion]);
 
   const handleGetProfiles = useCallback(async () => {
-    getProfiles();
+    getProfiles({
+      chainId: ChainId.MATIC,
+      accountAddress: pkh!,
+    });
   }, [getProfiles]);
 
   const handleCreateProfile = useCallback(async () => {
@@ -379,7 +387,10 @@ export const FileSystem = () => {
       console.error("profileHandle undefined");
       return;
     }
-    createProfile(profileHandle);
+    createProfile({
+      chainId: ChainId.MATIC,
+      handle: profileHandle,
+    });
   }, [createProfile]);
 
   return (

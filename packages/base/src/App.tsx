@@ -6,7 +6,7 @@ import {
   useApp,
   useCollectFile,
   useCreateIndexFile,
-  useDatatokenInfo,
+  useLoadDatatoken,
   useFeedsByAddress,
   useMonetizeFile,
   useStore,
@@ -88,7 +88,7 @@ const App = () => {
     },
   );
 
-  const { datatokenInfo, getDatatokenInfo } = useDatatokenInfo({
+  const { datatokenInfo, loadDatatoken } = useLoadDatatoken({
     onSuccess: result => {
       console.log("[datatokenInfo]get datatoken info success, result:", result);
     },
@@ -222,8 +222,8 @@ const App = () => {
       console.error("currentFileId undefined");
       return;
     }
-    getDatatokenInfo(currentFileId);
-  }, [getDatatokenInfo, currentFileId]);
+    loadDatatoken(currentFileId);
+  }, [loadDatatoken, currentFileId]);
 
   const collectPost = useCallback(async () => {
     if (!currentFileId) {
