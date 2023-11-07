@@ -1,6 +1,10 @@
 import React, { useState, useEffect, useCallback, useContext } from "react";
 
-import { Currency } from "@dataverse/dataverse-connector";
+import {
+  ChainId,
+  Currency,
+  DatatokenType,
+} from "@dataverse/dataverse-connector";
 import {
   useApp,
   useCollectFile,
@@ -18,7 +22,7 @@ import { useNavigate } from "react-router-dom";
 
 import { AppContext } from "../../main";
 
-// const datatokenType = DatatokenType.Profileless;
+const datatokenType = DatatokenType.Profileless;
 export const Home = () => {
   const { modelParser, appVersion: postVersion } = useContext(AppContext);
   const navigate = useNavigate();
@@ -209,6 +213,9 @@ export const Home = () => {
     monetizeFile({
       fileId: currentFileId,
       datatokenVars: {
+        type: datatokenType,
+        collectModule: "LimitedFeeCollectModule",
+        chainId: ChainId.Mumbai,
         currency: Currency.WMATIC,
         amount: 0.0001,
         collectLimit: 1000,

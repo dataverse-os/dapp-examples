@@ -1,7 +1,11 @@
 import "./App.css";
 import React, { useState, useEffect, useCallback } from "react";
 
-import { Currency } from "@dataverse/dataverse-connector";
+import {
+  ChainId,
+  Currency,
+  DatatokenType,
+} from "@dataverse/dataverse-connector";
 import {
   useApp,
   useCollectFile,
@@ -20,6 +24,7 @@ import app from "../output/app.json";
 
 const postVersion = "0.0.1";
 const modelParser = new ModelParser(app as Output);
+const datatokenType = DatatokenType.Profileless;
 
 const App = () => {
   const [postModel, setPostModel] = useState<Model>();
@@ -209,6 +214,9 @@ const App = () => {
     monetizeFile({
       fileId: currentFileId,
       datatokenVars: {
+        type: datatokenType,
+        collectModule: "LimitedFeeCollectModule",
+        chainId: ChainId.Mumbai,
         currency: Currency.WMATIC,
         amount: 0.0001,
         collectLimit: 1000,

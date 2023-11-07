@@ -4,6 +4,7 @@ import {
   ActionType,
   ChainId,
   Currency,
+  DatatokenType,
   // DatatokenType,
   MirrorFile,
   StorageProviderName,
@@ -35,7 +36,7 @@ import { useNavigate } from "react-router-dom";
 
 import { AppContext } from "../../main";
 
-// const datatokenType = DatatokenType.Profileless;
+const datatokenType = DatatokenType.Profileless;
 export const FileSystem = () => {
   const { modelParser } = useContext(AppContext);
   const navigate = useNavigate();
@@ -337,7 +338,11 @@ export const FileSystem = () => {
   }, [loadCreatedDataUnions]);
 
   const handleCreateDataUnion = useCallback(async () => {
-    if (!profileId && (!profileIds || profileIds.length === 0)) {
+    if (
+      datatokenType !== DatatokenType.Profileless &&
+      !profileId &&
+      (!profileIds || profileIds.length === 0)
+    ) {
       console.error("please createProfile or getProfiles first!");
       return;
     }
@@ -348,10 +353,22 @@ export const FileSystem = () => {
       // actionType: ActionType.LIKE,
       dataUnionVars: {
         datatokenVars: {
-          profileId: (profileId || profileIds?.[0]) as string,
+          type: datatokenType,
+          collectModule: "LimitedFeeCollectModule",
+          chainId: ChainId.Mumbai,
+          ...((profileId || profileIds?.[0]) && {
+            profileId: profileId || profileIds?.[0],
+          }),
           collectLimit: 100,
           amount: 0.0001,
           currency: Currency.WMATIC,
+        },
+        resourceId: "",
+        subscribeModule: "TimeSegmentSubscribeModule",
+        subscribeModuleInput: {
+          amount: 0.0001,
+          currency: Currency.WMATIC,
+          segment: "Week",
         },
       },
     });
@@ -377,7 +394,7 @@ export const FileSystem = () => {
 
   const handleGetProfiles = useCallback(async () => {
     getProfiles({
-      chainId: ChainId.MATIC,
+      chainId: ChainId.Mumbai,
       accountAddress: pkh!,
     });
   }, [getProfiles]);
@@ -388,7 +405,7 @@ export const FileSystem = () => {
       return;
     }
     createProfile({
-      chainId: ChainId.MATIC,
+      chainId: ChainId.Mumbai,
       handle: profileHandle,
     });
   }, [createProfile]);
