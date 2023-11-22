@@ -1,12 +1,16 @@
 import "@rainbow-me/rainbowkit/styles.css";
 import React, { useState, useEffect, useCallback } from "react";
 
-import { Currency } from "@dataverse/dataverse-connector";
+import {
+  ChainId,
+  Currency,
+  DatatokenType,
+} from "@dataverse/dataverse-connector";
 import {
   useApp,
   useCollectFile,
   useCreateIndexFile,
-  useDatatokenInfo,
+  useLoadDatatoken,
   useFeedsByAddress,
   useMonetizeFile,
   useStore,
@@ -21,6 +25,7 @@ import app from "../output/app.json";
 
 const postVersion = "0.0.1";
 const modelParser = new ModelParser(app as Output);
+const datatokenType = DatatokenType.Profileless;
 
 const App = () => {
   const [postModel, setPostModel] = useState<Model>();
@@ -88,7 +93,7 @@ const App = () => {
     },
   );
 
-  const { datatokenInfo, getDatatokenInfo } = useDatatokenInfo({
+  const { datatokenInfo, loadDatatoken } = useLoadDatatoken({
     onSuccess: result => {
       console.log("[datatokenInfo]get datatoken info success, result:", result);
     },
@@ -209,6 +214,9 @@ const App = () => {
     monetizeFile({
       fileId: currentFileId,
       datatokenVars: {
+        type: datatokenType,
+        collectModule: "LimitedFeeCollectModule",
+        chainId: ChainId.Mumbai,
         currency: Currency.WMATIC,
         amount: 0.0001,
         collectLimit: 1000,
@@ -222,8 +230,8 @@ const App = () => {
       console.error("currentFileId undefined");
       return;
     }
-    getDatatokenInfo(currentFileId);
-  }, [getDatatokenInfo, currentFileId]);
+    loadDatatoken(currentFileId);
+  }, [loadDatatoken, currentFileId]);
 
   const collectPost = useCallback(async () => {
     if (!currentFileId) {
