@@ -1,0 +1,161 @@
+#root {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: center;
+}
+
+.logo {
+  height: 6em;
+  padding: 1.5em;
+  will-change: filter;
+}
+.logo:hover {
+  filter: drop-shadow(0 0 2em #646cffaa);
+}
+.logo.react:hover {
+  filter: drop-shadow(0 0 2em #61dafbaa);
+}
+
+@keyframes logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  a:nth-of-type(2) .logo {
+    animation: logo-spin infinite 20s linear;
+  }
+}
+
+.card {
+  padding: 2em;
+}
+
+.read-the-docs {
+  color: #888;
+}
+
+button {
+  display: block;
+  /* margin: 10px auto; */
+}
+
+.black-text {
+  color: black;
+  font-family: Poppins;
+  max-width: 800px;
+  overflow: auto;
+}
+
+.red {
+  color: red;
+  font-size: 14px;
+  font-family: Poppins;
+}
+
+.json-view {
+  font-size: 12px;
+  text-align: start;
+}
+
+.header {
+  position: fixed;
+  top: 0;
+  height: 100px;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 60px;
+  color: black;
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.body {
+  position: fixed;
+  top: 100px;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+}
+
+.connect-container {
+  min-width: 140px;
+  display: flex;
+  justify-content: center;
+}
+
+.connect-box {
+  display: flex;
+}
+
+.connect-box > img {
+  width: 20px;
+  margin-right: 5px;
+}
+
+.connect-box > .placeholder {
+  width: 20px;
+  margin-left: 5px;
+}
+
+.left {
+  width: 50%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.right {
+  width: 50%;
+  height: 100%;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+.create-post-input {
+  width:200px;
+  height:100px;
+  margin-bottom: 20px;
+}
+
+.create-post {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 220px;
+}
+
+.create-post > img {
+  width: 20px;
+  margin-right: 5px;
+}
+
+.create-post > .placeholder {
+  width: 20px;
+  margin-left: 5px;
+}
+
+input,
+textarea {
+  border-radius: 12px;
+  border: solid 1px #ddd;
+  outline: unset;
+  padding: 8px 10px;
+  background: white;
+  color: black;
+}
