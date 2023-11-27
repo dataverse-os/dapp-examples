@@ -16,5 +16,5 @@ export const config = {
       encryptable: [],
     },
   ],
-  ceramicUrl: "https://dataverseceramicdaemon.com", // leave null to use dataverse test Ceramic node. Set to {Your Ceramic node Url} for mainnet, should start with "https://".
+  ceramicUrl: null, // leave null to use dataverse test Ceramic node. Set to {Your Ceramic node Url} for mainnet, should start with "https://".
 };
