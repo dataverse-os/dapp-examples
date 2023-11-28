@@ -10,7 +10,7 @@ import {
   useLoadActionFiles,
   useLoadFolders,
 } from "@dataverse/hooks";
-import { Model, ModelParser, Output } from "@dataverse/model-parser";
+import { ModelParser, Output } from "@dataverse/model-parser";
 
 import loadingIcon from "./assets/loading.svg";
 import Post from "./components/Post";
@@ -21,16 +21,10 @@ const postVersion = "0.0.1";
 const modelParser = new ModelParser(app as Output);
 
 const App = () => {
-  const [postModel, setPostModel] = useState<Model>();
-  const [actionFileModel, setActionFileModel] = useState<Model>();
+  const postModel = modelParser.getModelByName("post");
+  const postModelId = postModel.streams[postModel.streams.length - 1].modelId;
+  const actionFileModel = modelParser.getModelByName("actionFile");
   const [postContent, setPostContent] = useState<string>();
-
-  useEffect(() => {
-    const postModel = modelParser.getModelByName("post");
-    const actionFileModel = modelParser.getModelByName("actionFile");
-    setPostModel(postModel);
-    setActionFileModel(actionFileModel);
-  }, []);
 
   /**
    * @summary import from @dataverse/hooks
@@ -45,7 +39,7 @@ const App = () => {
       return;
     }
 
-    loadFeeds(postModel.streams[postModel.streams.length - 1].modelId);
+    loadFeeds();
   }, [postModel]);
 
   useEffect(() => {
@@ -53,9 +47,7 @@ const App = () => {
       console.error("actionFileModel undefined");
       return;
     }
-    loadActionFiles(
-      actionFileModel.streams[actionFileModel.streams.length - 1].modelId,
-    );
+    loadActionFiles();
   }, [actionFileModel]);
 
   useEffect(() => {
@@ -81,6 +73,7 @@ const App = () => {
     });
 
   const { loadFeeds } = useFeeds({
+    model: postModel,
     onError: error => {
       console.error("[loadPosts]load files failed,", error);
     },
@@ -90,6 +83,7 @@ const App = () => {
   });
 
   const { loadActionFiles } = useLoadActionFiles({
+    model: actionFileModel,
     onError: error => {
       console.error("[loadActionFiles]load files failed,", error);
     },
@@ -166,12 +160,10 @@ const App = () => {
           </button>
         </div>
         <div className='right'>
-          {posts &&
-            Object.values(posts)
+          {posts?.[postModelId] &&
+            Object.values(posts[postModelId])
               .sort(
-                (a, b) =>
-                  Date.parse(b.fileContent.file.createdAt) -
-                  Date.parse(a.fileContent.file.createdAt),
+                (a, b) => Date.parse(b.createdAt!) - Date.parse(a.createdAt!),
               )
               .map((post, index) => <Post post={post} key={index} />)}
         </div>

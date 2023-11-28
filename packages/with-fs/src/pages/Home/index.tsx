@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useContext } from "react";
+import React, { useState, useCallback, useContext } from "react";
 
 import {
   ChainId,
@@ -16,7 +16,6 @@ import {
   useUnlockFile,
   useUpdateIndexFile,
 } from "@dataverse/hooks";
-import { Model } from "@dataverse/model-parser";
 import ReactJson from "react-json-view";
 import { useNavigate } from "react-router-dom";
 
@@ -26,13 +25,8 @@ const datatokenType = DatatokenType.Profileless;
 export const Home = () => {
   const { modelParser, appVersion: postVersion } = useContext(AppContext);
   const navigate = useNavigate();
-  const [postModel, setPostModel] = useState<Model>();
+  const postModel = modelParser.getModelByName("post");
   const [currentFileId, setCurrentFileId] = useState<string>();
-
-  useEffect(() => {
-    const postModel = modelParser.getModelByName("post");
-    setPostModel(postModel);
-  }, []);
 
   /**
    * @summary import from @dataverse/hooks
@@ -69,6 +63,7 @@ export const Home = () => {
   });
 
   const { loadFeedsByAddress } = useFeedsByAddress({
+    model: postModel,
     onError: error => {
       console.error("[loadPosts]load files failed,", error);
     },
@@ -176,10 +171,7 @@ export const Home = () => {
       return;
     }
 
-    await loadFeedsByAddress({
-      pkh,
-      modelId: postModel.streams[postModel.streams.length - 1].modelId,
-    });
+    await loadFeedsByAddress(pkh);
   }, [postModel, pkh, loadFeedsByAddress]);
 
   const updatePost = useCallback(async () => {

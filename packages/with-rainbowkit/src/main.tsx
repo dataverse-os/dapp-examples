@@ -1,9 +1,13 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import App from "./App";
+
 import "./index.css";
 import "./global.css";
 import { DataverseContextProvider } from "@dataverse/hooks";
+import {
+  // dataverseWallet,
+  injectedDataverseWallet,
+} from "@dataverse/wallet-adapter";
 import {
   getDefaultWallets,
   RainbowKitProvider,
@@ -14,14 +18,12 @@ import {
   trustWallet,
   ledgerWallet,
 } from "@rainbow-me/rainbowkit/wallets";
-import {
-  // dataverseWallet,
-  injectedDataverseWallet,
-} from "@dataverse/wallet-adapter";
 import { configureChains, createConfig, WagmiConfig } from "wagmi";
 import { mainnet, goerli, polygon, bsc, bscTestnet } from "wagmi/chains";
-import { polygonMumbai } from "./utils/configChains";
 import { publicProvider } from "wagmi/providers/public";
+
+import App from "./App";
+import { polygonMumbai } from "./utils/configChains";
 
 const { chains, publicClient } = configureChains(
   [mainnet, goerli, polygon, polygonMumbai, bsc, bscTestnet],

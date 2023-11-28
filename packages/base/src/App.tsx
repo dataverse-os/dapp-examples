@@ -1,5 +1,5 @@
 import "./App.css";
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useCallback } from "react";
 
 import {
   ChainId,
@@ -17,7 +17,7 @@ import {
   useUnlockFile,
   useUpdateIndexFile,
 } from "@dataverse/hooks";
-import { Model, ModelParser, Output } from "@dataverse/model-parser";
+import { ModelParser, Output } from "@dataverse/model-parser";
 import ReactJson from "react-json-view";
 
 import app from "../output/app.json";
@@ -27,13 +27,8 @@ const modelParser = new ModelParser(app as Output);
 const datatokenType = DatatokenType.Profileless;
 
 const App = () => {
-  const [postModel, setPostModel] = useState<Model>();
+  const postModel = modelParser.getModelByName("post");
   const [currentFileId, setCurrentFileId] = useState<string>();
-
-  useEffect(() => {
-    const postModel = modelParser.getModelByName("post");
-    setPostModel(postModel);
-  }, []);
 
   /**
    * @summary import from @dataverse/hooks
@@ -70,6 +65,7 @@ const App = () => {
   });
 
   const { loadFeedsByAddress } = useFeedsByAddress({
+    model: postModel,
     onError: error => {
       console.error("[loadPosts]load files failed,", error);
     },
@@ -177,10 +173,7 @@ const App = () => {
       return;
     }
 
-    await loadFeedsByAddress({
-      pkh,
-      modelId: postModel.streams[postModel.streams.length - 1].modelId,
-    });
+    await loadFeedsByAddress(pkh);
   }, [postModel, pkh, loadFeedsByAddress]);
 
   const updatePost = useCallback(async () => {

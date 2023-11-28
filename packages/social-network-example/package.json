@@ -12,7 +12,7 @@
   "dependencies": {
     "@arco-design/web-react": "^2.56.0",
     "@composedb/devtools": "^0.4.4",
-    "@dataverse/dataverse-connector": "^1.0.30",
+    "@dataverse/dataverse-connector": "^1.0.31",
     "@dataverse/hooks": "^1.0.34",
     "@dataverse/model-parser": "^1.0.2",
     "ethers": "5.6.9",
