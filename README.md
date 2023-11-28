@@ -16,15 +16,10 @@ This is a basic example of a Dataverse dapp, which includes two models: `post`
 and `profile` with locate in `./base/models`. It demonstrates the process of
 creating, loading, monetizing, and unlocking a post by using Dataverse hooks.
 
-### 2.with-toolkits
+### 2.with-fs
 
-This example adds some commonly used
-[dweb-toolkit](https://github.com/dataverse-os/dweb-toolkits) on top of the
-base. In this example, the models will be diverse and varied.
-
-In this example, each toolkit has its own models. In addition to the `post` and
-`profile` models in the base, you can find different toolkit models in the
-`./with-toolkits/models/toolkits` folder.
+This example adds some commonly used file-system calls on top of the base. 
+It demonstrates more process of handling file/folder and data-token/data-union by using Dataverse hooks.
 
 ## Run
 
