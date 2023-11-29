@@ -92,23 +92,21 @@ const Post = ({ post }: { post: any }) => {
       </div>
 
       {commentActionList.map(actionFile => (
-        <>
-          <div className='comment'>
-            <div className='comment-left'>
-              <Avatar address={getAddressFromDid(actionFile.controller!)} />
-              <div className='line'></div>
-            </div>
-            <div className='comment-right'>
-              <div className='address'>
-                {addressAbbreviation(getAddressFromDid(actionFile.controller!))}
-              </div>
-              <div className='time'>
-                ·{timeAgo(Date.parse(actionFile.createdAt!))}
-              </div>
-              <div className='content'>{actionFile.action.comment}</div>
-            </div>
+        <div className='comment' key={actionFile.fileId}>
+          <div className='comment-left'>
+            <Avatar address={getAddressFromDid(actionFile.controller!)} />
+            <div className='line'></div>
           </div>
-        </>
+          <div className='comment-right'>
+            <div className='address'>
+              {addressAbbreviation(getAddressFromDid(actionFile.controller!))}
+            </div>
+            <div className='time'>
+              ·{timeAgo(Date.parse(actionFile.createdAt!))}
+            </div>
+            <div className='content'>{actionFile.action.comment}</div>
+          </div>
+        </div>
       ))}
       <div className='footer'>
         <div className='comment-container'>

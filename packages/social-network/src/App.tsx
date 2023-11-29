@@ -131,7 +131,7 @@ const App = () => {
   return (
     <>
       <div className='header'>
-        <div>Social Network Example</div>
+        <div>Social Network</div>
         <button onClick={connect} className='connect-container'>
           <>
             {pkh ? (

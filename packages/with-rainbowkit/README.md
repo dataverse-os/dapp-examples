@@ -6,13 +6,11 @@
 </p >
 <br/>
 
-# dapp-base-example
+# dapp-rainbowkit-example
 
 ## Overview
 
-This is a basic example of a Dataverse dapp, which includes two models: `post`
-and `profile` with locate in `./base/models`. It demonstrates the process of
-creating, loading, monetizing, and unlocking a post by using Dataverse hooks.
+This example adds rainbowkit on top of the base. 
 
 ## Run
 
