@@ -6,22 +6,21 @@
 </p >
 <br/>
 
-# dapp-base-example
+# dapp-fs-example
 
 ## Overview
 
-This is a basic example of a Dataverse dapp, which includes two models: `post`
-and `profile` with locate in `./base/models`. It demonstrates the process of
-creating, loading, monetizing, and unlocking a post by using Dataverse hooks.
+This example adds some commonly used file-system calls on top of the base. 
+It demonstrates more process of handling file/folder and data-token/data-union by using Dataverse hooks.
 
 ## Run
 
 ### 1.Prepare
 
-Before running example, you need to install `dataverseos-cmd`.
+Before running example, you need to install `create-dataverse-app`.
 
 ```
-pnpm install -g dataverseos-cmd
+pnpm install -g create-dataverse-app
 ```
 
 ### 2.Install

@@ -6,17 +6,12 @@
 </p >
 <br/>
 
-# dapp-base-example
+# dapp-social-network
 
 ## Overview
 
-This example adds some commonly used
-[dweb-toolkit](https://github.com/dataverse-os/dweb-toolkits) on top of the
-base. In this example, the models will be diverse and varied.
-
-In this example, each toolkit has its own models. In addition to the `post` and
-`profile` models in the base, you can find different toolkit models in the
-`./with-toolkits/models/toolkits` folder.
+This example shows how to build a basic Dataverse dapp of social-network. 
+It demonstrates actions like posting, commenting, liking, etc.
 
 ## Run
 
